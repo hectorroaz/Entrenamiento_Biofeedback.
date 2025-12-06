@@ -10,93 +10,259 @@
             --bg: #000000;
             --card: #1c1c1e;
             --text: #ffffff;
-            --z0: #6b7280;
-            --z1: #3b82f6;
-            --z2: #22c55e;
-            --z3: #eab308;
-            --z4: #f97316;
-            --z5: #ef4444;
+            --z0: #6b7280; /* Gris */
+            --z1: #3b82f6; /* Azul */
+            --z2: #22c55e; /* Verde */
+            --z3: #eab308; /* Amarillo */
+            --z4: #f97316; /* Naranja */
+            --z5: #ef4444; /* Rojo */
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; text-align: center; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            text-align: center;
+        }
         
         /* HEADER */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 5px; }
-        .config-box { font-size: 0.8rem; background: #333; padding: 5px 8px; border-radius: 8px; display: flex; align-items: center; gap: 5px; flex-grow: 1; justify-content: center; height: 32px;}
-        input[type=number] { width: 30px; background: transparent; border: none; color: var(--z2); font-weight: bold; text-align: center; font-size: 0.9rem; border-bottom: 1px solid #555; }
-        select.zone-selector { background: transparent; color: white; border: none; font-weight: bold; font-size: 0.75rem; text-align: center; width: 100%; outline: none; }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            gap: 5px;
+        }
+        .config-box {
+            font-size: 0.8rem;
+            background: #333;
+            padding: 5px 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-grow: 1;
+            justify-content: center;
+            height: 32px;
+        }
+        input[type=number] {
+            width: 30px;
+            background: transparent;
+            border: none;
+            color: var(--z2);
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #555;
+        }
+        select.zone-selector {
+            background: transparent;
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-align: center;
+            width: 100%;
+            outline: none;
+        }
         option { background: #333; color: white; }
-        .btn-icon { background: #333; border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-        
-        /* FEEDBACK */
-        .feedback-box { background: #111; border-radius: 15px; padding: 5px; margin: 5px 0; border: 2px solid #333; text-align: center; min-height: 45px; display: flex; flex-direction: column; justify-content: center; transition: border-color 0.3s; }
-        #fb-main { font-size: 1.2rem; font-weight: 900; margin-bottom: 0px; text-transform: uppercase; letter-spacing: 0.5px; }
-        #fb-sub { font-size: 0.8rem; color: #aaa; }
 
-        /* AREA CENTRAL: GAUGE + STATUS */
-        .dashboard-row {
+        .btn-icon {
+            background: #333;
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            margin: 5px 0 10px 0;
-            height: 140px;
         }
-
-        /* GAUGE CENTRADO */
-        .gauge-container { position: relative; width: 260px; height: 130px; }
-        canvas#gaugeCanvas { width: 100%; height: 100%; }
-        .gauge-data { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
-        .bpm-big { font-size: 3rem; font-weight: 800; line-height: 1; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .zone-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 2px; }
-
-        /* INDICADOR A LA DERECHA */
-        .status-btn { 
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 70px; 
-            height: 70px;
+        
+        /* FEEDBACK (Arriba) */
+        .feedback-box {
+            background: #111;
             border-radius: 15px;
-            border: 2px solid #444;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            background: #222; 
-            color: #555; 
-            transition: 0.2s; 
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            padding: 8px;
+            margin: 5px 0 5px 0;
+            border: 2px solid #333;
+            text-align: center;
+            min-height: 45px;
+            display: flex;
             flex-direction: column;
-            line-height: 1.2;
-            z-index: 10;
+            justify-content: center;
+            transition: border-color 0.3s;
         }
-        .status-btn:active { transform: translateY(-45%) scale(0.95); }
-        .status-btn.up { background: white; color: black; box-shadow: 0 0 15px rgba(255,255,255,0.5); border-color: white; }
-        .status-icon { font-size: 1.5rem; margin-bottom: 2px; }
+        #fb-main {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #fb-sub {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
 
-        /* METRICAS (4 COLUMNAS) */
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        .card { background: var(--card); border-radius: 10px; padding: 8px 4px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-        .lbl { font-size: 0.55rem; color: #888; text-transform: uppercase; white-space: nowrap; }
-        .val { font-size: 1.2rem; font-weight: 700; }
-        .timer-val { font-family: monospace; letter-spacing: -1px; color: var(--z3); }
+        /* FILA ESTADO ARRIBA/ABAJO */
+        .status-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        /* INDICADOR ARRIBA/ABAJO */
+        .status-pill {
+            min-width: 130px;
+            margin: 0;
+            font-size: 0.8rem;
+            font-weight: 800;
+            padding: 0 12px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            border-radius: 6px;
+            text-transform: uppercase;
+            background: #222;
+            color: #999;
+            transition: 0.2s;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .status-pill.up {
+            background: white;
+            color: black;
+            box-shadow: 0 0 10px rgba(255,255,255,0.6);
+        }
+
+        /* GAUGE */
+        .gauge-container {
+            position: relative;
+            width: 280px;
+            height: 140px;
+            margin: 0 auto 10px auto;
+        }
+        canvas#gaugeCanvas { width: 100%; height: 100%; }
+        .gauge-data {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+        .bpm-big {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .zone-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* METRICAS: 4 columnas en una sola fila */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .lbl {
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .val {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .timer-val {
+            font-family: monospace;
+            letter-spacing: -1px;
+            color: var(--z3);
+        }
 
         /* CONEXIONES */
-        .conn-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-conn { flex: 1; background: #333; color: white; padding: 10px; border: 1px solid #555; border-radius: 10px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.3s; }
+        .conn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-conn {
+            flex: 1;
+            background: #333;
+            color: white;
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
         .btn-conn.connected { display: none; }
 
         /* BOTONES MODOS */
-        .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #333; color: #aaa; font-size: 0.75rem; }
-        .btn.active { background: white; color: black; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #333;
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+        .btn.active {
+            background: white;
+            color: black;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
         
         /* FIN */
-        .btn-end { width: 100%; background: var(--z5); color: white; padding: 12px; border: none; border-radius: 12px; font-weight: bold; margin-top: auto; font-size: 0.9rem;}
+        .btn-end {
+            width: 100%;
+            background: var(--z5);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-top: auto;
+        }
 
     </style>
 </head>
@@ -104,9 +270,11 @@
 
     <div class="header-row">
         <button class="btn-icon" onclick="toggleFullscreen()">⛶</button>
+        
         <div class="config-box">
             Edad: <input type="number" id="userAge" value="33" onchange="calculateZones()">
         </div>
+        
         <div class="config-box">
             🎯 <select id="targetZoneSelect" class="zone-selector" onchange="updateBioFeedback()">
                 <option value="auto">Auto</option>
@@ -125,21 +293,17 @@
         <div id="fb-sub">Selecciona modo o conecta sensores</div>
     </div>
     
-    <!-- CENTRAL DASHBOARD: GAUGE + STATUS BUTTON -->
-    <div class="dashboard-row">
-        <div class="gauge-container">
-            <canvas id="gaugeCanvas"></canvas>
-            <div class="gauge-data">
-                <div class="bpm-big" id="hrValue">--</div>
-                <div class="zone-label" id="zoneLabel" style="color: #666;">--</div>
-            </div>
-        </div>
+    <!-- INDICADOR ARRIBA/ABAJO, AHORA A LA DERECHA Y CLICABLE -->
+    <div class="status-row">
+        <div id="statusIndicator" class="status-pill" onclick="toggleStatusManual()">ABAJO</div>
+    </div>
 
-        <!-- Botón Estado Interactivo -->
-        <button id="statusIndicator" class="status-btn" onclick="toggleManualStatus()">
-            <span class="status-icon">⬇</span>
-            <span>ABAJO</span>
-        </button>
+    <div class="gauge-container">
+        <canvas id="gaugeCanvas"></canvas>
+        <div class="gauge-data">
+            <div class="bpm-big" id="hrValue">--</div>
+            <div class="zone-label" id="zoneLabel" style="color: #666;">Desconectado</div>
+        </div>
     </div>
 
     <div class="conn-row" id="connectionRow">
@@ -147,23 +311,23 @@
         <button class="btn-conn" id="btn-hr" onclick="connectHR()">❤️ CARDIO</button>
     </div>
 
-    <!-- METRICAS (4 EN LINEA) -->
+    <!-- 4 TARJETAS: REPS, TIEMPO, SQUEEZE, REPS/MIN -->
     <div class="metrics-grid">
         <div class="card">
-            <span class="lbl">Reps</span>
+            <span class="lbl">Repeticiones</span>
             <span class="val" id="repValue" style="color:white">0</span>
         </div>
         <div class="card">
-            <span class="lbl">Tiempo</span>
+            <span class="lbl">Tiempo Sesión</span>
             <span class="val timer-val" id="timerValue">00:00</span>
         </div>
         <div class="card">
-            <span class="lbl">Squeeze (s)</span>
+            <span class="lbl">Squeeze (seg)</span>
             <span class="val" id="squeezeValue">0.0</span>
         </div>
         <div class="card">
-            <span class="lbl">Reps/Min</span>
-            <span class="val" id="rpmValue" style="color:var(--z1)">0.0</span>
+            <span class="lbl">Reps/min</span>
+            <span class="val" id="repRateValue" style="color:white">0.0</span>
         </div>
     </div>
 
@@ -173,19 +337,23 @@
         <button class="btn" onclick="setMode('FLOW')">FLOW</button>
     </div>
 
-    <button class="btn-end" onclick="endSession()">🏁 FINALIZAR</button>
+    <button class="btn-end" onclick="endSession()">🏁 FINALIZAR Y EXPORTAR REPORTE</button>
 
 <script>
-    /* ==========================================================================
-       WAKE LOCK & UTIL
-       ========================================================================== */
+    /* ========================================================================
+       WAKE LOCK MANAGER
+       ======================================================================== */
     let wakeLock = null;
+    function shouldHoldWakeLock() { return true; }
     async function acquireWakeLockOnce() {
       if (!('wakeLock' in navigator) || wakeLock) return;
       try {
         wakeLock = await navigator.wakeLock.request('screen');
-        wakeLock.addEventListener('release', () => { wakeLock = null; });
-      } catch (err) { console.warn('WakeLock Err:', err); }
+        wakeLock.addEventListener('release', () => {
+          wakeLock = null;
+          if (document.visibilityState === 'visible') acquireWakeLockOnce();
+        });
+      } catch (err) { console.warn('⚠️ Wake Lock Error:', err); }
     }
     document.addEventListener('click', acquireWakeLockOnce, {once:true});
     document.addEventListener('visibilitychange', () => { 
@@ -194,20 +362,30 @@
 
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => console.log(err));
+            document.documentElement.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
         } else {
             if (document.exitFullscreen) document.exitFullscreen();
         }
     }
 
-    /* ==========================================================================
-       LÓGICA APP
-       ========================================================================== */
+
+    /* ========================================================================
+       LÓGICA PRINCIPAL APP
+       ======================================================================== */
 
     let state = {
-        age: 33, maxHR: 187, hr: 0, reps: 0, lastSqueeze: 0, 
-        mode: 'HIIT', isUp: false,
-        sessionActive: false, startTime: 0, totalPauseTime: 0, lastPauseStart: 0, lastActivityTime: 0
+        age: 33,
+        maxHR: 187,
+        hr: 0,
+        reps: 0,
+        lastSqueeze: 0,
+        mode: 'HIIT',
+        isUp: false,
+        sessionActive: false,
+        startTime: 0,
+        totalPauseTime: 0,
+        lastPauseStart: 0,
+        lastActivityTime: 0
     };
 
     let sessionLog = [];
@@ -221,6 +399,7 @@
     function calculateZones() {
         state.age = document.getElementById('userAge').value;
         state.maxHR = 220 - state.age;
+        
         const sel = document.getElementById('targetZoneSelect');
         const ranges = [
             {l: 'Zona 1', min: 0.5, max: 0.6},
@@ -229,11 +408,13 @@
             {l: 'Zona 4', min: 0.8, max: 0.9},
             {l: 'Zona 5', min: 0.9, max: 1.0}
         ];
+        
         for(let i=0; i<ranges.length; i++){
             const minBPM = Math.round(state.maxHR * ranges[i].min);
             const maxBPM = Math.round(state.maxHR * ranges[i].max);
             sel.options[i+1].text = `${ranges[i].l} (${minBPM}-${maxBPM})`;
         }
+
         updateBioFeedback(); 
     }
 
@@ -248,19 +429,23 @@
 
         const elapsed = Date.now() - state.startTime - state.totalPauseTime;
         const totalSecs = Math.floor(elapsed / 1000);
+
         const m = Math.floor(totalSecs / 60).toString().padStart(2, '0');
         const s = (totalSecs % 60).toString().padStart(2, '0');
         document.getElementById('timerValue').innerText = `${m}:${s}`;
         
-        // CALCULO DE REPS/MIN (RPM)
-        const mins = totalSecs / 60;
-        let rpm = 0;
-        if (mins > 0) {
-            rpm = (state.reps / mins).toFixed(1);
+        // Reps/min
+        const repRateEl = document.getElementById('repRateValue');
+        if (totalSecs > 0) {
+            const rpm = (state.reps * 60) / totalSecs;
+            repRateEl.innerText = rpm.toFixed(1);
+        } else {
+            repRateEl.innerText = "0.0";
         }
-        document.getElementById('rpmValue').innerText = rpm;
-        
-        if (state.hr > 0) sessionLog.push({ t: totalSecs, hr: state.hr, type: 'status' });
+
+        if (state.hr > 0) {
+            sessionLog.push({ t: totalSecs, hr: state.hr, type: 'status' });
+        }
     }
 
     function startSession() {
@@ -286,92 +471,84 @@
         }
     }
 
-    /* ==========================================================================
-       MANUAL OVERRIDE (NUEVA FUNCION)
-       ========================================================================== */
-    function toggleManualStatus() {
-        // Invertimos el estado actual manualmente
-        state.isUp = !state.isUp;
-        updateStatusUI();
-        
-        // Si no hay sesión activa, la iniciamos al tocar el botón
-        if (!state.sessionActive && state.startTime === 0) {
-            startSession();
-        }
-        state.lastActivityTime = Date.now();
-
-        // Lógica de conteo manual (si bajamos y subimos manualmente)
-        if (!state.isUp) { // Si ahora es ABAJO
-           // No contamos rep aquí para no duplicar facilmente, 
-           // pero podríamos contar si venimos de ARRIBA.
-           // Por simplicidad visual, solo cambiamos el estado.
-           state.reps++;
-           document.getElementById('repValue').innerText = state.reps;
-        }
-    }
-
-    function updateStatusUI() {
-        const btn = document.getElementById('statusIndicator');
-        const icon = btn.querySelector('.status-icon');
-        const text = btn.querySelector('span:last-child');
-
-        if (state.isUp) {
-            // Estado ARRIBA
-            btn.classList.add('up');
-            icon.innerText = "⬆";
-            text.innerText = "ARRIBA";
-        } else {
-            // Estado ABAJO
-            btn.classList.remove('up');
-            icon.innerText = "⬇";
-            text.innerText = "ABAJO";
-        }
-    }
-
-    /* ==========================================================================
-       CONEXIONES BLUETOOTH
-       ========================================================================== */
     function checkConnections() {
         const btnEsp = document.getElementById('btn-esp');
         const btnHr = document.getElementById('btn-hr');
         const row = document.getElementById('connectionRow');
+
         if (btnEsp.classList.contains('connected')) btnEsp.style.display = 'none';
         if (btnHr.classList.contains('connected')) btnHr.style.display = 'none';
+
         if (btnEsp.style.display === 'none' && btnHr.style.display === 'none') {
             row.style.display = 'none';
         }
     }
 
+    /* ------------------------------------------------------------------------
+       CONTROL DE ESTADO ARRIBA/ABAJO
+       ------------------------------------------------------------------------ */
+    function setStatus(isUp) {
+        state.isUp = isUp;
+        const pill = document.getElementById('statusIndicator');
+        if (isUp) {
+            pill.innerText = "ARRIBA";
+            pill.classList.add('up');
+        } else {
+            pill.innerText = "ABAJO";
+            pill.classList.remove('up');
+        }
+    }
+
+    // Permite al usuario corregir manualmente cuando falle el sensor
+    function toggleStatusManual() {
+        setStatus(!state.isUp);
+    }
+
+    // 1. MAQUINA
     async function connectMachine() {
         const btn = document.getElementById('btn-esp');
         try {
-            btn.innerText = "⏳";
-            const device = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'Ab' }], optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'] });
+            btn.innerText = "⏳ ...";
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ namePrefix: 'Ab' }],
+                optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
+            });
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
             const char = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
             await char.startNotifications();
             char.addEventListener('characteristicvaluechanged', handleESPData);
+            
             btn.classList.add('connected');
             checkConnections();
             acquireWakeLockOnce(); 
-        } catch (e) { console.error(e); btn.innerText = "🔌 Reintentar"; }
+
+        } catch (e) {
+            console.error(e);
+            btn.innerText = "🔌 Reintentar";
+        }
     }
 
+    // 2. CARDIO
     async function connectHR() {
         const btn = document.getElementById('btn-hr');
         try {
-            btn.innerText = "⏳";
+            btn.innerText = "⏳ ...";
             const device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
             const server = await device.gatt.connect();
             const service = await server.getPrimaryService('heart_rate');
             const char = await service.getCharacteristic('heart_rate_measurement');
             await char.startNotifications();
             char.addEventListener('characteristicvaluechanged', handleHRData);
+            
             btn.classList.add('connected');
             checkConnections();
             acquireWakeLockOnce();
-        } catch (e) { console.error(e); btn.innerText = "❤️ Reintentar"; }
+
+        } catch (e) {
+            console.error(e);
+            btn.innerText = "❤️ Reintentar";
+        }
     }
 
     function handleESPData(e) {
@@ -379,18 +556,21 @@
         startSession(); 
 
         if (val === 0.0) {
-            state.isUp = true;
+            // Fase ARRIBA
+            setStatus(true);
         } else if (val > 0) {
-            state.isUp = false;
+            // Fase ABAJO + conteo de repetición
+            setStatus(false);
+            
             state.reps++;
             state.lastSqueeze = val;
             document.getElementById('repValue').innerText = state.reps;
             document.getElementById('squeezeValue').innerText = val.toFixed(1);
+            
             const elapsed = Math.floor((Date.now() - state.startTime - state.totalPauseTime) / 1000);
             sessionLog.push({ t: elapsed, type: 'rep', val: val });
             updateBioFeedback();
         }
-        updateStatusUI(); // Actualizar UI basado en estado del sensor
     }
 
     function handleHRData(e) {
@@ -403,7 +583,8 @@
         if (visualPct < 0) visualPct = 0;
 
         const absolutePct = state.hr / state.maxHR;
-        let zoneIdx = 0; let zoneText = "Reposo";
+        let zoneIdx = 0; 
+        let zoneText = "Reposo";
 
         if (absolutePct < 0.50) { zoneIdx = 0; zoneText = "Calentamiento"; }
         else if (absolutePct < 0.60) { zoneIdx = 1; zoneText = "Zona 1"; }
@@ -432,11 +613,17 @@
             const targetZoneIdx = parseInt(targetSelection); 
             const minPct = 0.5 + ((targetZoneIdx - 1) * 0.1); 
             const maxPct = minPct + 0.1;
-            if (pct < minPct) updateFeedback("SUBE RITMO 🔼", `Meta: Zona ${targetSelection}`, Z_COLORS[targetZoneIdx]);
-            else if (pct > maxPct) updateFeedback("BAJA RITMO 🔽", `Sobre Zona ${targetSelection}`, Z_COLORS[targetZoneIdx]);
-            else updateFeedback("¡EN ZONA! 🎯", `Manteniendo Zona ${targetSelection}`, "#fff");
+
+            if (pct < minPct) {
+                updateFeedback("SUBE RITMO 🔼", `Meta: Zona ${targetSelection}`, Z_COLORS[targetZoneIdx]);
+            } else if (pct > maxPct) {
+                updateFeedback("BAJA RITMO 🔽", `Sobre Zona ${targetSelection}`, Z_COLORS[targetZoneIdx]);
+            } else {
+                updateFeedback("¡EN ZONA! 🎯", `Manteniendo Zona ${targetSelection}`, "#fff");
+            }
             return;
         }
+
         // AUTO
         if (state.mode === 'HIIT') {
             if (pct < 0.7) updateFeedback("¡ACELERA!", "Busca Zona Naranja", Z_COLORS[3]);
@@ -479,39 +666,63 @@
         const H = cvs.height = 150;
         ctx.clearRect(0,0,W,H);
         
-        ctx.beginPath(); ctx.arc(W/2, H, 130, Math.PI, 0); ctx.lineWidth = 18; ctx.strokeStyle = "#333"; ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(W/2, H, 130, Math.PI, 0);
+        ctx.lineWidth = 18;
+        ctx.strokeStyle = "#333";
+        ctx.stroke();
 
         if (pct > 1) pct = 1;
         const endAngle = Math.PI + (Math.PI * pct);
         let color = overrideColor || "#666"; 
 
-        ctx.beginPath(); ctx.arc(W/2, H, 130, Math.PI, endAngle); ctx.strokeStyle = color; ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(W/2, H, 130, Math.PI, endAngle);
+        ctx.strokeStyle = color;
+        ctx.stroke();
         
         const needleLen = 120;
         const needleAngle = Math.PI + (Math.PI * pct);
         const nx = W/2 + needleLen * Math.cos(needleAngle);
         const ny = H + needleLen * Math.sin(needleAngle);
-        ctx.beginPath(); ctx.moveTo(W/2, H); ctx.lineTo(nx, ny); ctx.lineWidth = 4; ctx.strokeStyle = "white"; ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(W/2, H);
+        ctx.lineTo(nx, ny);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "white";
+        ctx.stroke();
     }
 
     function endSession() {
         if(!confirm("¿Finalizar y descargar reporte?")) return;
         
         const date = new Date().toLocaleString();
-        const avgHR = Math.round(sessionLog.filter(d => d.type === 'status').reduce((a,b)=>a+b.hr,0) / (sessionLog.length||1));
+        const avgHR = Math.round(
+            sessionLog.filter(d => d.type === 'status').reduce((a,b)=>a+b.hr,0) /
+            ((sessionLog.filter(d => d.type === 'status').length) || 1)
+        );
         
         const labels = sessionLog.map(d => d.t + 's');
         const hrData = sessionLog.map(d => d.hr > 0 ? d.hr : null);
         const repData = sessionLog.map(d => d.type === 'rep' ? d.val : null); 
 
-        const html = `<html><head><title>Reporte AbSmart</title><style>body{font-family:sans-serif;padding:20px;background:#f0f2f5}.box{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}h1{color:#333}</style></head><body>
+        const html = `<html><head><title>Reporte AbSmart</title><style>
+            body{font-family:sans-serif;padding:20px;background:#f0f2f5}
+            .box{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+            h1{color:#333}
+            </style></head><body>
             <h1>Reporte AbSmart Pro</h1>
-            <div class="box"><p><strong>Fecha:</strong> ${date}</p><p><strong>Reps Totales:</strong> ${state.reps}</p><p><strong>HR Promedio:</strong> ${avgHR} bpm</p><p><strong>Duración:</strong> ${document.getElementById('timerValue').innerText}</p><p><strong>Reps/Min Final:</strong> ${document.getElementById('rpmValue').innerText}</p></div>
+            <div class="box">
+                <p><strong>Fecha:</strong> ${date}</p>
+                <p><strong>Reps Totales:</strong> ${state.reps}</p>
+                <p><strong>HR Promedio:</strong> ${avgHR} bpm</p>
+                <p><strong>Duración:</strong> ${document.getElementById('timerValue').innerText}</p>
+            </div>
             <div class="box" style="height:400px"><canvas id="c"></canvas></div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
             <script>
                 new Chart(document.getElementById('c'), {
-                    type: 'bar', 
+                    type: 'bar',
                     data: {
                         labels: ${JSON.stringify(labels)},
                         datasets: [
@@ -522,7 +733,7 @@
                                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                                 yAxisID: 'y1',
                                 barThickness: 8,
-                                order: 2 
+                                order: 2
                             },
                             {
                                 label: 'Frecuencia Cardíaca (BPM)',
@@ -533,7 +744,7 @@
                                 yAxisID: 'y',
                                 tension: 0.4,
                                 pointRadius: 0,
-                                order: 1 
+                                order: 1
                             }
                         ]
                     },
