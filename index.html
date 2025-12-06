@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AbSmart Science v4.0</title>
+    <title>AbSmart Science v4.1</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #000000;
             --card: #1c1c1e;
             --text: #ffffff;
+            --z0: #6b7280; /* Gris (Reposo/Calentamiento) */
             --z1: #3b82f6; /* Azul */
             --z2: #22c55e; /* Verde */
             --z3: #eab308; /* Amarillo */
@@ -25,15 +26,19 @@
         select.zone-selector { background: transparent; color: white; border: none; font-weight: bold; font-size: 0.8rem; text-align: center; width: 100%; outline: none; }
         option { background: #333; color: white; }
 
-        /* BOTONES DE UTILIDAD (Fullscreen) */
         .btn-icon { background: #333; border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;}
         
         /* INDICADOR ARRIBA/ABAJO */
         .status-pill { font-size: 0.7rem; font-weight: 800; padding: 0 10px; height: 32px; display: flex; align-items: center; border-radius: 6px; text-transform: uppercase; background: #222; color: #555; transition: 0.2s; min-width: 60px; justify-content: center;}
         .status-pill.up { background: white; color: black; box-shadow: 0 0 15px rgba(255,255,255,0.8); }
 
+        /* FEEDBACK (REUBICADO ARRIBA) */
+        .feedback-box { background: #111; border-radius: 15px; padding: 10px; margin: 5px 0 10px 0; border: 2px solid #333; text-align: center; min-height: 45px; display: flex; flex-direction: column; justify-content: center; transition: border-color 0.3s; }
+        #fb-main { font-size: 1.2rem; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        #fb-sub { font-size: 0.8rem; color: #aaa; }
+
         /* GAUGE */
-        .gauge-container { position: relative; width: 280px; height: 140px; margin: 5px auto; }
+        .gauge-container { position: relative; width: 280px; height: 140px; margin: 0 auto 10px auto; }
         canvas#gaugeCanvas { width: 100%; height: 100%; }
         .gauge-data { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
         .bpm-big { font-size: 3.5rem; font-weight: 800; line-height: 1; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
@@ -46,21 +51,16 @@
         .val { font-size: 1.4rem; font-weight: 700; }
         .timer-val { font-family: monospace; letter-spacing: -1px; color: var(--z3); }
 
-        /* FEEDBACK */
-        .feedback-box { background: #111; border-radius: 15px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #555; text-align: left; min-height: 50px; display: flex; flex-direction: column; justify-content: center; }
-        #fb-main { font-size: 1.1rem; font-weight: bold; margin-bottom: 4px; }
-        #fb-sub { font-size: 0.8rem; color: #aaa; }
+        /* CONEXIONES INDEPENDIENTES */
+        .conn-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn-conn { flex: 1; background: #333; color: white; padding: 12px; border: 1px solid #555; border-radius: 10px; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.3s; }
+        .btn-conn.connected { background: var(--z2); border-color: var(--z2); color: black; display: none; /* Se oculta al conectar */ }
 
         /* BOTONES MODOS */
         .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
         .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #333; color: #aaa; font-size: 0.8rem; }
         .btn.active { background: white; color: black; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
         
-        /* CONEXIONES INDEPENDIENTES */
-        .conn-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-conn { flex: 1; background: #333; color: white; padding: 12px; border: 1px solid #555; border-radius: 10px; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: 0.3s; }
-        .btn-conn.connected { background: var(--z2); border-color: var(--z2); color: black; }
-
         /* FIN */
         .btn-end { width: 100%; background: var(--z5); color: white; padding: 14px; border: none; border-radius: 12px; font-weight: bold; margin-top: auto; }
 
@@ -89,6 +89,12 @@
         <div id="statusIndicator" class="status-pill">ABAJO</div>
     </div>
 
+    <!-- FEEDBACK REUBICADO AQUÍ -->
+    <div class="feedback-box" id="feedbackBox">
+        <div id="fb-main">LISTO</div>
+        <div id="fb-sub">Selecciona modo o conecta sensores</div>
+    </div>
+
     <div class="gauge-container">
         <canvas id="gaugeCanvas"></canvas>
         <div class="gauge-data">
@@ -97,7 +103,7 @@
         </div>
     </div>
 
-    <div class="conn-row">
+    <div class="conn-row" id="connectionRow">
         <button class="btn-conn" id="btn-esp" onclick="connectMachine()">🔌 MÁQUINA</button>
         <button class="btn-conn" id="btn-hr" onclick="connectHR()">❤️ CARDIO</button>
     </div>
@@ -117,11 +123,6 @@
         </div>
     </div>
 
-    <div class="feedback-box" id="feedbackBox">
-        <div id="fb-main">Listo para entrenar</div>
-        <div id="fb-sub">Conecta los sensores o selecciona un modo.</div>
-    </div>
-
     <div class="btn-group">
         <button class="btn active" onclick="setMode('HIIT')">HIIT</button>
         <button class="btn" onclick="setMode('HYPER')">HIPERTROFIA</button>
@@ -132,28 +133,20 @@
 
 <script>
     /* ==========================================================================
-       WAKE LOCK MANAGER (PERMANENTE SI PANTALLA VISIBLE)
+       WAKE LOCK MANAGER
        ========================================================================== */
     let wakeLock = null;
-    
-    // Ahora devuelve TRUE siempre que la página sea visible para mantener la pantalla encendida
-    // sin importar si está pausado o no, tal como solicitaste.
     function shouldHoldWakeLock() { return true; }
-
     async function acquireWakeLockOnce() {
       if (!('wakeLock' in navigator) || wakeLock) return;
       try {
         wakeLock = await navigator.wakeLock.request('screen');
-        console.log('💡 Pantalla bloqueada');
         wakeLock.addEventListener('release', () => {
           wakeLock = null;
-          // Re-intentar inmediatamente si la página sigue visible
           if (document.visibilityState === 'visible') acquireWakeLockOnce();
         });
       } catch (err) { console.warn('⚠️ Wake Lock Error:', err); }
     }
-
-    // Activación inicial por interacción
     document.addEventListener('click', acquireWakeLockOnce, {once:true});
     document.addEventListener('visibilitychange', () => { 
         if (document.visibilityState === 'visible') acquireWakeLockOnce(); 
@@ -161,13 +154,9 @@
 
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                alert(`Error al activar pantalla completa: ${err.message}`);
-            });
+            document.documentElement.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
         } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
+            if (document.exitFullscreen) document.exitFullscreen();
         }
     }
 
@@ -183,7 +172,9 @@
     };
 
     let sessionLog = [];
-    const Z_COLORS = ["#3b82f6", "#22c55e", "#eab308", "#f97316", "#ef4444"];
+    // Incluimos el Gris en el índice 0 para < 50%
+    // Indices: 0:Gris, 1:Azul, 2:Verde, 3:Amarillo, 4:Naranja, 5:Rojo
+    const Z_COLORS = ["#6b7280", "#3b82f6", "#22c55e", "#eab308", "#f97316", "#ef4444"];
     
     // Init
     calculateZones();
@@ -211,7 +202,6 @@
         const s = (totalSecs % 60).toString().padStart(2, '0');
         document.getElementById('timerValue').innerText = `${m}:${s}`;
         
-        // Log para gráfica: Tiempo y HR
         if (state.hr > 0) sessionLog.push({ t: totalSecs, hr: state.hr, type: 'status' });
     }
 
@@ -238,8 +228,21 @@
         }
     }
 
-    // --- CONEXIÓN INDEPENDIENTE ---
-    
+    // --- MANEJO VISUAL DE CONEXIONES ---
+    function checkConnections() {
+        const btnEsp = document.getElementById('btn-esp');
+        const btnHr = document.getElementById('btn-hr');
+        const row = document.getElementById('connectionRow');
+
+        if (btnEsp.classList.contains('connected')) btnEsp.style.display = 'none';
+        if (btnHr.classList.contains('connected')) btnHr.style.display = 'none';
+
+        // Si ambos están conectados, ocultar la fila completa para ahorrar espacio
+        if (btnEsp.style.display === 'none' && btnHr.style.display === 'none') {
+            row.style.display = 'none';
+        }
+    }
+
     // 1. MAQUINA (ESP32)
     async function connectMachine() {
         const btn = document.getElementById('btn-esp');
@@ -252,9 +255,9 @@
             await char.startNotifications();
             char.addEventListener('characteristicvaluechanged', handleESPData);
             
-            btn.innerText = "🔌 OK";
             btn.classList.add('connected');
-            acquireWakeLockOnce(); // Trigger Wake Lock
+            checkConnections();
+            acquireWakeLockOnce(); 
 
         } catch (e) {
             console.error(e);
@@ -274,9 +277,9 @@
             await char.startNotifications();
             char.addEventListener('characteristicvaluechanged', handleHRData);
             
-            btn.innerText = "❤️ OK";
             btn.classList.add('connected');
-            acquireWakeLockOnce(); // Trigger Wake Lock
+            checkConnections();
+            acquireWakeLockOnce();
 
         } catch (e) {
             console.error(e);
@@ -302,7 +305,6 @@
             document.getElementById('repValue').innerText = state.reps;
             document.getElementById('squeezeValue').innerText = val.toFixed(1);
             
-            // Loguear Repetición (Tiempo, valor de squeeze)
             const elapsed = Math.floor((Date.now() - state.startTime - state.totalPauseTime) / 1000);
             sessionLog.push({ t: elapsed, type: 'rep', val: val });
             updateBioFeedback();
@@ -313,39 +315,53 @@
         const val = e.target.value.getUint8(1);
         state.hr = val;
         
-        // CÁLCULO GAUGE AJUSTADO (Base 50 BPM)
-        // Si HR < 50, pct es 0.
-        const minGauge = 50; 
+        // Gauge visual
+        const minGauge = 40; 
         let range = state.maxHR - minGauge;
         let visualPct = (state.hr - minGauge) / range;
         if (visualPct < 0) visualPct = 0;
 
-        // Cálculo de Zona Real (Para color)
+        // Cálculo de Zona Real
         const absolutePct = state.hr / state.maxHR;
-        let zoneIdx = 0;
-        if (absolutePct >= 0.9) zoneIdx = 4;
-        else if (absolutePct >= 0.8) zoneIdx = 3;
-        else if (absolutePct >= 0.7) zoneIdx = 2;
-        else if (absolutePct >= 0.6) zoneIdx = 1;
+        let zoneIdx = 0; // Por defecto Gris
+        let zoneText = "Reposo";
+
+        // Lógica de color ajustada:
+        // < 50% = Gris (0)
+        // 50-60% = Azul (1)
+        // 60-70% = Verde (2)
+        // 70-80% = Amarillo (3)
+        // 80-90% = Naranja (4)
+        // > 90% = Rojo (5)
+
+        if (absolutePct < 0.50) { zoneIdx = 0; zoneText = "Calentamiento"; }
+        else if (absolutePct < 0.60) { zoneIdx = 1; zoneText = "Zona 1 (Quema)"; }
+        else if (absolutePct < 0.70) { zoneIdx = 2; zoneText = "Zona 2 (Cardio)"; }
+        else if (absolutePct < 0.80) { zoneIdx = 3; zoneText = "Zona 3 (Aerobico)"; }
+        else if (absolutePct < 0.90) { zoneIdx = 4; zoneText = "Zona 4 (Anaerobico)"; }
+        else { zoneIdx = 5; zoneText = "Zona 5 (Máximo)"; }
         
+        const currentColor = Z_COLORS[zoneIdx];
+
         document.getElementById('hrValue').innerText = val;
-        document.getElementById('hrValue').style.color = Z_COLORS[zoneIdx];
-        document.getElementById('zoneLabel').innerText = `Zona ${zoneIdx + 1} (${Math.round(absolutePct*100)}%)`;
-        document.getElementById('zoneLabel').style.color = Z_COLORS[zoneIdx];
+        document.getElementById('hrValue').style.color = currentColor;
+        document.getElementById('zoneLabel').innerText = `${zoneText} (${Math.round(absolutePct*100)}%)`;
+        document.getElementById('zoneLabel').style.color = currentColor;
         
-        drawGauge(visualPct);
-        updateBioFeedback();
+        drawGauge(visualPct, currentColor);
+        updateBioFeedback(absolutePct);
     }
 
-    // --- CEREBRO CON ZONAS MANUALES ---
-    function updateBioFeedback() {
+    function updateBioFeedback(pct) {
+        // Si no tenemos HR reciente, no actualizamos lógica de zonas
+        if(!pct) pct = state.hr / state.maxHR;
         const targetSelection = document.getElementById('targetZoneSelect').value;
-        const pct = state.hr / state.maxHR;
 
         // CASO 1: ZONA MANUAL
         if (targetSelection !== 'auto') {
-            const targetZoneIdx = parseInt(targetSelection) - 1; 
-            const minPct = 0.5 + (targetZoneIdx * 0.1); 
+            const targetZoneIdx = parseInt(targetSelection); 
+            // Definimos rangos manuales simples (1=50-60, 2=60-70, etc)
+            const minPct = 0.5 + ((targetZoneIdx - 1) * 0.1); 
             const maxPct = minPct + 0.1;
 
             if (pct < minPct) {
@@ -360,21 +376,21 @@
 
         // CASO 2: AUTOMÁTICO
         if (state.mode === 'HIIT') {
-            if (pct < 0.7) updateFeedback("¡ACELERA!", "Busca Zona Naranja/Roja", "#eab308");
-            else if (pct > 0.92) updateFeedback("ALTO RIESGO", "Límite máximo alcanzado", "#ef4444");
-            else updateFeedback("RITMO HIIT 🔥", "Intensidad ideal", "#22c55e");
+            if (pct < 0.7) updateFeedback("¡ACELERA!", "Busca Zona Naranja/Roja", Z_COLORS[3]);
+            else if (pct > 0.92) updateFeedback("ALTO RIESGO", "Límite máximo alcanzado", Z_COLORS[5]);
+            else updateFeedback("RITMO HIIT 🔥", "Intensidad ideal", Z_COLORS[2]);
         } 
         else if (state.mode === 'HYPER') {
-            if (pct > 0.75) updateFeedback("RECUPERA...", `Baja a Zona Azul`, "#3b82f6");
+            if (pct > 0.75) updateFeedback("RECUPERA...", `Baja a Zona Azul`, Z_COLORS[1]);
             else {
-                if (state.lastSqueeze < 1.0 && state.reps > 0) updateFeedback("SUBIDA RÁPIDA", "Sostén 1 seg arriba", "#f97316");
-                else updateFeedback("MODO FUERZA 💪", "Control total", "#22c55e");
+                if (state.lastSqueeze < 1.0 && state.reps > 0) updateFeedback("SUBIDA RÁPIDA", "Sostén 1 seg arriba", Z_COLORS[4]);
+                else updateFeedback("MODO FUERZA 💪", "Control total", Z_COLORS[2]);
             }
         }
         else if (state.mode === 'FLOW') {
-            if (pct < 0.6) updateFeedback("SUBE INTENSIDAD", "Entra en zona aeróbica", "#3b82f6");
-            else if (pct > 0.8) updateFeedback("BAJA INTENSIDAD", "Saliendo de zona flow", "#f97316");
-            else updateFeedback("FLOW STATE 🌊", "Ritmo perfecto", "#22c55e");
+            if (pct < 0.6) updateFeedback("SUBE INTENSIDAD", "Entra en zona aeróbica", Z_COLORS[1]);
+            else if (pct > 0.8) updateFeedback("BAJA INTENSIDAD", "Saliendo de zona flow", Z_COLORS[4]);
+            else updateFeedback("FLOW STATE 🌊", "Ritmo perfecto", Z_COLORS[2]);
         }
     }
 
@@ -382,7 +398,7 @@
         const box = document.getElementById('feedbackBox');
         document.getElementById('fb-main').innerText = main;
         document.getElementById('fb-sub').innerText = sub;
-        box.style.borderLeftColor = color;
+        box.style.borderColor = color; // Borde completo
         document.getElementById('fb-main').style.color = color;
     }
 
@@ -393,23 +409,21 @@
         updateBioFeedback();
     }
 
-    function drawGauge(pct) {
+    function drawGauge(pct, overrideColor) {
         const cvs = document.getElementById('gaugeCanvas');
         const ctx = cvs.getContext('2d');
         const W = cvs.width = 300; 
         const H = cvs.height = 150;
         ctx.clearRect(0,0,W,H);
         
+        // Fondo Arco
         ctx.beginPath(); ctx.arc(W/2, H, 130, Math.PI, 0); ctx.lineWidth = 18; ctx.strokeStyle = "#333"; ctx.stroke();
 
         if (pct > 1) pct = 1;
         const endAngle = Math.PI + (Math.PI * pct);
         
-        let color = Z_COLORS[0];
-        if(pct > 0.2) color = Z_COLORS[1]; // Ajustado visualmente para base 50bpm
-        if(pct > 0.4) color = Z_COLORS[2];
-        if(pct > 0.6) color = Z_COLORS[3];
-        if(pct > 0.8) color = Z_COLORS[4];
+        // Color dinámico según lógica HR o override
+        let color = overrideColor || "#666"; 
 
         ctx.beginPath(); ctx.arc(W/2, H, 130, Math.PI, endAngle); ctx.strokeStyle = color; ctx.stroke();
         
@@ -427,10 +441,8 @@
         const date = new Date().toLocaleString();
         const avgHR = Math.round(sessionLog.filter(d => d.type === 'status').reduce((a,b)=>a+b.hr,0) / (sessionLog.length||1));
         
-        // Preparar Datos Duales
         const labels = sessionLog.map(d => d.t + 's');
         const hrData = sessionLog.map(d => d.hr > 0 ? d.hr : null);
-        // Las repeticiones se grafican en el segundo exacto
         const repData = sessionLog.map(d => d.type === 'rep' ? d.val : null); 
 
         const html = `<html><head><title>Reporte AbSmart</title><style>body{font-family:sans-serif;padding:20px;background:#f0f2f5}.box{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}h1{color:#333}</style></head><body>
