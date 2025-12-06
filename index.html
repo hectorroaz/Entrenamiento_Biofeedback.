@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AbSmart Bio-Link v2</title>
+    <title>AbSmart Bio-Link</title>
     <style>
-        /* --- ESTILOS VISUALES --- */
+        /* --- ESTILOS NEON / DARK MODE --- */
         :root {
             --bg-color: #0d0d0d;
             --card-bg: #1a1a1a;
-            --primary: #00f2ff;
-            --success: #00ff88;
-            --warn: #ffcc00;
-            --danger: #ff3355;
+            --primary: #00f2ff;   /* Cian - Neutro/Flow */
+            --success: #00ff88;   /* Verde - Hipertrofia Bien hecha */
+            --warn: #ffcc00;      /* Amarillo - Advertencia */
+            --danger: #ff3355;    /* Rojo - HIIT/Error */
             --text-main: #ffffff;
             --text-dim: #888888;
         }
@@ -22,32 +22,419 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            min-height: 100vh;
+            height: 100vh;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
         }
 
-        h1 { margin: 0 0 15px 0; font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); opacity: 0.8; }
+        h1 { margin: 0 0 20px 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); }
 
-        /* --- DASHBOARD DE 3 COLUMNAS --- */
+        /* --- DASHBOARD SUPERIOR --- */
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* Tres columnas iguales */
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 12px 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 1px solid #333;
+            transition: all 0.3s;
+        }
+
+        .card-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+        .card-value { font-size: 2.5rem; font-weight: 700; display: block; line-height: 1; }
+        .card-unit { font-size: 0.9rem; color: var(--text-dim); }
+
+        /* --- FEEDBACK CENTRAL (El Cerebro) --- */
+        .feedback-zone {
+            flex-grow: 1;
+            background: #000;
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid #333;
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
         }
+
+        #main-msg { font-size: 1.8rem; font-weight: 800; margin: 0; text-transform: uppercase; z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        #sub-msg { color: var(--text-dim); margin-top: 10px; font-size: 1rem; z-index: 2; }
+
+        /* Barra de Progreso Dinámica */
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #333;
+            border-radius: 6px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s ease-out, background 0.3s;
+        }
+        /* Marcador de objetivo para Hipertrofia (1 segundo) */
+        .target-marker {
+            position: absolute;
+            left: 50%; /* Asumiendo escala de 2s, 1s es 50% */
+            top: 0; bottom: 0;
+            width: 2px;
+            background: white;
+            z-index: 5;
+            display: none; /* Se activa por JS solo en modo Hipertrofia */
+        }
+
+        /* --- CONTROLES INFERIORES --- */
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            background: var(--card-bg);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid #333;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 40px;
+            transition: 0.3s;
+            font-size: 0.8rem;
+        }
+        .mode-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+
+        .conn-row { display: flex; gap: 10px; }
+        .btn-conn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #333;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-conn.connected { background: var(--success); color: #000; }
+        
+    </style>
+</head>
+<body>
+
+    <h1>AbSmart <span style="font-size:0.5em; vertical-align: middle; opacity: 0.5;">PRO</span></h1>
+
+    <!-- PANEL DE DATOS -->
+    <div class="metrics-grid">
+        <!-- Ritmo Cardíaco -->
+        <div class="card" id="card-hr">
+            <span class="card-label">Corazón</span>
+            <span class="card-value" id="val-hr">--</span>
+            <span class="card-unit">BPM</span>
+        </div>
+        
+        <!-- Tiempo de Squeeze (Dato del ESP32) -->
+        <div class="card" id="card-squeeze">
+            <span class="card-label">Pico (Squeeze)</span>
+            <span class="card-value" id="val-sq">0.0</span>
+            <span class="card-unit">Segundos</span>
+        </div>
+    </div>
+
+    <!-- CEREBRO VIRTUAL (Feedback) -->
+    <div class="feedback-zone" id="feedback-zone">
+        <h2 id="main-msg">CONECTA SENSORES</h2>
+        <div id="sub-msg">Selecciona un modo para iniciar</div>
+        
+        <div class="progress-container">
+            <div class="target-marker" id="target-marker"></div>
+            <div class="progress-bar" id="p-bar"></div>
+        </div>
+    </div>
+
+    <!-- CONTROLES -->
+    <div class="controls">
+        <!-- Selector de Modo -->
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('HIIT')">HIIT</button>
+            <button class="mode-btn" onclick="setMode('HYPER')">HIPERTROFIA</button>
+            <button class="mode-btn" onclick="setMode('FLOW')">FLOW</button>
+        </div>
+
+        <!-- Conexiones Bluetooth -->
+        <div class="conn-row">
+            <button class="btn-conn" id="btn-esp" onclick="connectESP()">
+                <span>⚡ Máquina</span>
+            </button>
+            <button class="btn-conn" id="btn-hr" onclick="connectHR()">
+                <span>❤️ Pulso</span>
+            </button>
+        </div>
+        
+        <div style="font-size: 0.8rem; color: #555;">Reps Totales: <span id="val-reps" style="color: white;">0</span></div>
+    </div>
+
+<script>
+    // --- VARIABLES DE ESTADO ---
+    let state = {
+        mode: 'HIIT',       // HIIT | HYPER | FLOW
+        hr: 0,              // Ritmo cardíaco actual
+        lastSqueeze: 0.0,   // Segundos en pico (última repetición)
+        reps: 0,            // Contador de repeticiones
+        maxHR: 190,         // Ajustar según edad (220 - edad)
+        connectedESP: false,
+        connectedHR: false
+    };
+
+    // --- CONFIGURACIÓN BLUETOOTH (Coincide con ESP32) ---
+    const ESP_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+    const ESP_CHAR_UUID    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+
+    // --- LÓGICA CORE: EL ENTRENADOR INTELIGENTE ---
+    function updateBioFeedback() {
+        const msg = document.getElementById('main-msg');
+        const sub = document.getElementById('sub-msg');
+        const bar = document.getElementById('p-bar');
+        const zone = document.getElementById('feedback-zone');
+        const marker = document.getElementById('target-marker');
+
+        // Cálculo de % HR
+        const hrPercent = state.hr > 0 ? (state.hr / state.maxHR) * 100 : 0;
+
+        // Limpieza de estilos previos
+        zone.style.borderColor = "#333";
+        marker.style.display = "none";
+
+        // ----------------------------------------------------
+        // MODO 1: HIIT (Quema Grasa / Metabólico)
+        // Objetivo: Mantener HR alto. El "Squeeze" no importa tanto.
+        // ----------------------------------------------------
+        if (state.mode === 'HIIT') {
+            if (hrPercent < 70) {
+                msg.innerText = "¡ACELERA! 🔥";
+                msg.style.color = "var(--warn)";
+                sub.innerText = "Sube pulsaciones (Zona Baja)";
+                zone.style.borderColor = "var(--warn)";
+            } else if (hrPercent > 92) {
+                msg.innerText = "¡BAJA RITMO! 🛑";
+                msg.style.color = "var(--danger)";
+                sub.innerText = "Pulsaciones al límite";
+                zone.style.borderColor = "var(--danger)";
+            } else {
+                msg.innerText = "¡MANTÉN RITMO! ⚡";
+                msg.style.color = "var(--primary)";
+                sub.innerText = "Zona Quema Grasa Óptima";
+                zone.style.borderColor = "var(--primary)";
+            }
+            // Barra = Intensidad Cardíaca
+            bar.style.width = hrPercent + "%";
+            bar.style.background = hrPercent > 90 ? "var(--danger)" : "var(--primary)";
+        }
+
+        // ----------------------------------------------------
+        // MODO 2: HIPERTROFIA (Construcción Muscular)
+        // Objetivo: Squeeze > 1.0s. Descanso si HR es alto.
+        // ----------------------------------------------------
+        else if (state.mode === 'HYPER') {
+            marker.style.display = "block"; // Mostrar marca de 1s
+
+            // A. Prioridad: ¿Necesita descansar?
+            if (hrPercent > 75) {
+                msg.innerText = "RECUPERA 🛌";
+                msg.style.color = "#aaa";
+                sub.innerText = `Espera a que baje el pulso (${state.hr} bpm)`;
+                bar.style.width = hrPercent + "%";
+                bar.style.background = "var(--warn)";
+                return; 
+            }
+
+            // B. Evaluar la calidad de la última repetición
+            // Escala de barra: 0s a 2.0s (donde 1s es el 50%)
+            let visualPercent = (state.lastSqueeze / 2.0) * 100;
+            if(visualPercent > 100) visualPercent = 100;
+            bar.style.width = visualPercent + "%";
+
+            if (state.lastSqueeze < 0.2) {
+                // Estado inicial o error
+                msg.innerText = "DALE FUERTE 💪";
+                sub.innerText = "Sube y sostén arriba";
+            } else if (state.lastSqueeze < 0.8) {
+                // Inercia / Muy rápido
+                msg.innerText = "¡MUY RÁPIDO! 🐢";
+                msg.style.color = "var(--danger)";
+                sub.innerText = "Controla la bajada. ¡Sin rebotes!";
+                bar.style.background = "var(--danger)";
+                zone.style.borderColor = "var(--danger)";
+            } else {
+                // Buena repetición
+                msg.innerText = "¡EXCELENTE! ⭐";
+                msg.style.color = "var(--success)";
+                sub.innerText = "Buena tensión mecánica";
+                bar.style.background = "var(--success)";
+                zone.style.borderColor = "var(--success)";
+            }
+        }
+
+        // ----------------------------------------------------
+        // MODO 3: FLOW (Resistencia / Cardio Estable)
+        // Objetivo: Mantenerse en Zona 3 (70-80%).
+        // ----------------------------------------------------
+        else if (state.mode === 'FLOW') {
+            const minZone = 70;
+            const maxZone = 80;
+
+            if (hrPercent < minZone) {
+                msg.innerText = "SUBE INTENSIDAD 🔼";
+                sub.innerText = "Estás debajo de la zona objetivo";
+                zone.style.borderColor = "var(--primary)";
+            } else if (hrPercent > maxZone) {
+                msg.innerText = "BAJA INTENSIDAD 🔽";
+                sub.innerText = "Estás encima de la zona objetivo";
+                zone.style.borderColor = "var(--warn)";
+            } else {
+                msg.innerText = "🌊 EN FLUJO 🌊";
+                msg.style.color = "var(--success)";
+                sub.innerText = "Ritmo cardíaco perfecto";
+                zone.style.borderColor = "var(--success)";
+            }
+            bar.style.width = hrPercent + "%";
+            bar.style.background = (hrPercent >= minZone && hrPercent <= maxZone) ? "var(--success)" : "#555";
+        }
+    }
+
+    // --- CONEXIÓN BLUETOOTH: ESP32 (MÁQUINA) ---
+    async function connectESP() {
+        const btn = document.getElementById('btn-esp');
+        try {
+            btn.innerText = "⏳ Buscando...";
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ namePrefix: 'Ab' }], // Coincide con BLEDevice::init("Ab-Coaster Pro")
+                optionalServices: [ESP_SERVICE_UUID]
+            });
+            
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService(ESP_SERVICE_UUID);
+            const char = await service.getCharacteristic(ESP_CHAR_UUID);
+            
+            await char.startNotifications();
+            char.addEventListener('characteristicvaluechanged', handleMachineData);
+
+            state.connectedESP = true;
+            btn.classList.add('connected');
+            btn.innerHTML = "<span>⚡ Conectado</span>";
+            document.getElementById('sub-msg').innerText = "Máquina lista. ¡Empieza!";
+
+        } catch (error) {
+            console.error(error);
+            alert("Error conectando Máquina: " + error);
+            btn.innerText = "⚡ Reintentar";
+        }
+    }
+
+    // Procesa los datos que vienen del Arduino (FLOAT 32)
+    function handleMachineData(event) {
+        const dataView = event.target.value;
+        // IMPORTANTE: Leer Float32, Little Endian (true)
+        // El Arduino envía 4 bytes representando segundos (ej: 1.25)
+        const seconds = dataView.getFloat32(0, true);
+        
+        state.lastSqueeze = seconds;
+        state.reps++;
+
+        // Actualizar UI
+        document.getElementById('val-sq').innerText = seconds.toFixed(2);
+        document.getElementById('val-reps').innerText = state.reps;
+
+        // Feedback inmediato visual
+        const cardSq = document.getElementById('card-squeeze');
+        cardSq.style.borderColor = "var(--primary)";
+        setTimeout(() => cardSq.style.borderColor = "#333", 500);
+
+        updateBioFeedback();
+    }
+
+    // --- CONEXIÓN BLUETOOTH: RITMO CARDÍACO (GENÉRICO) ---
+    async function connectHR() {
+        const btn = document.getElementById('btn-hr');
+        try {
+            btn.innerText = "⏳ Buscando...";
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ services: ['heart_rate'] }]
+            });
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService('heart_rate');
+            const char = await service.getCharacteristic('heart_rate_measurement');
+            
+            await char.startNotifications();
+            char.addEventListener('characteristicvaluechanged', handleHRData);
+
+            state.connectedHR = true;
+            btn.classList.add('connected');
+            btn.innerHTML = "<span>❤️ Conectado</span>";
+
+        } catch (error) {
+            console.error(error);
+            alert("Error HR Monitor. Asegúrate que está puesto.");
+            btn.innerText = "❤️ Reintentar";
+        }
+    }
+
+    function handleHRData(event) {
+        const value = event.target.value;
+        // Byte 0: Flags, Byte 1: Valor (usualmente uint8)
+        const hr = value.getUint8(1);
+        
+        state.hr = hr;
+        document.getElementById('val-hr').innerText = hr;
+        
+        // El HR actualiza el feedback constantemente (para descansos o HIIT)
+        updateBioFeedback();
+    }
+
+    // --- UTILIDADES UI ---
+    function setMode(newMode) {
+        state.mode = newMode;
+        
+        // Actualizar botones
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.includes(newMode) || (newMode === 'HYPER' && btn.innerText.includes('HIPER'))) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Reset visuales
+        document.getElementById('main-msg').innerText = newMode + " ACTIVO";
+        document.getElementById('sub-msg').innerText = "Haz una repetición para calibrar";
+        state.reps = 0;
+        document.getElementById('val-reps').innerText = "0";
+        updateBioFeedback();
+    }
+</script>
+
+</body>
+</html>
