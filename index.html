@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AbSmart Bio-Link</title>
+    <title>AbSmart Bio-Link Pro</title>
     <style>
         /* --- ESTILOS NEON / DARK MODE --- */
         :root {
             --bg-color: #0d0d0d;
             --card-bg: #1a1a1a;
-            --primary: #00f2ff;   /* Cian - Neutro/Flow */
-            --success: #00ff88;   /* Verde - Hipertrofia Bien hecha */
-            --warn: #ffcc00;      /* Amarillo - Advertencia */
-            --danger: #ff3355;    /* Rojo - HIIT/Error */
+            --primary: #00f2ff;   /* Cian */
+            --success: #00ff88;   /* Verde */
+            --warn: #ffcc00;      /* Amarillo */
+            --danger: #ff3355;    /* Rojo */
             --text-main: #ffffff;
             --text-dim: #888888;
+            --accent-reps: #d000ff; /* Un color morado neón para destacar las Reps */
         }
 
         body {
@@ -22,7 +23,7 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             height: 100vh;
             box-sizing: border-box;
@@ -30,28 +31,37 @@
             flex-direction: column;
         }
 
-        h1 { margin: 0 0 20px 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); }
+        h1 { margin: 0 0 15px 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); }
 
-        /* --- DASHBOARD SUPERIOR --- */
+        /* --- DASHBOARD SUPERIOR (3 COLUMNAS) --- */
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            /* CAMBIO VISUAL: 3 Columnas iguales */
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         .card {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 10px 5px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 1px solid #333;
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .card-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px; }
-        .card-value { font-size: 2.5rem; font-weight: 700; display: block; line-height: 1; }
-        .card-unit { font-size: 0.9rem; color: var(--text-dim); }
+        .card-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .card-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+        .card-unit { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px;}
+
+        /* Estilo especial para la tarjeta de Repeticiones */
+        #card-reps .card-value { color: var(--accent-reps); font-size: 2.2rem; }
+        #card-reps { border-color: #444; }
 
         /* --- FEEDBACK CENTRAL (El Cerebro) --- */
         .feedback-zone {
@@ -96,7 +106,7 @@
             width: 2px;
             background: white;
             z-index: 5;
-            display: none; /* Se activa por JS solo en modo Hipertrofia */
+            display: none; 
         }
 
         /* --- CONTROLES INFERIORES --- */
@@ -148,24 +158,26 @@
 
     <h1>AbSmart <span style="font-size:0.5em; vertical-align: middle; opacity: 0.5;">PRO</span></h1>
 
-    <!-- PANEL DE DATOS -->
     <div class="metrics-grid">
-        <!-- Ritmo Cardíaco -->
+        <div class="card" id="card-reps">
+            <span class="card-label">Reps</span>
+            <span class="card-value" id="val-reps">0</span>
+            <span class="card-unit">Total</span>
+        </div>
+
         <div class="card" id="card-hr">
-            <span class="card-label">Corazón</span>
+            <span class="card-label">Pulso</span>
             <span class="card-value" id="val-hr">--</span>
             <span class="card-unit">BPM</span>
         </div>
         
-        <!-- Tiempo de Squeeze (Dato del ESP32) -->
         <div class="card" id="card-squeeze">
-            <span class="card-label">Pico (Squeeze)</span>
+            <span class="card-label">Pico</span>
             <span class="card-value" id="val-sq">0.0</span>
-            <span class="card-unit">Segundos</span>
+            <span class="card-unit">Seg</span>
         </div>
     </div>
 
-    <!-- CEREBRO VIRTUAL (Feedback) -->
     <div class="feedback-zone" id="feedback-zone">
         <h2 id="main-msg">CONECTA SENSORES</h2>
         <div id="sub-msg">Selecciona un modo para iniciar</div>
@@ -176,16 +188,13 @@
         </div>
     </div>
 
-    <!-- CONTROLES -->
     <div class="controls">
-        <!-- Selector de Modo -->
         <div class="mode-selector">
             <button class="mode-btn active" onclick="setMode('HIIT')">HIIT</button>
             <button class="mode-btn" onclick="setMode('HYPER')">HIPERTROFIA</button>
             <button class="mode-btn" onclick="setMode('FLOW')">FLOW</button>
         </div>
 
-        <!-- Conexiones Bluetooth -->
         <div class="conn-row">
             <button class="btn-conn" id="btn-esp" onclick="connectESP()">
                 <span>⚡ Máquina</span>
@@ -195,10 +204,80 @@
             </button>
         </div>
         
-        <div style="font-size: 0.8rem; color: #555;">Reps Totales: <span id="val-reps" style="color: white;">0</span></div>
+        <div style="font-size: 0.7rem; color: #444;">v2.0 - WakeLock Active</div>
     </div>
 
 <script>
+    /* ==========================================================================
+       WAKE LOCK MANAGER (Integrado según solicitud)
+       ========================================================================== */
+    // 1. Estado y Referencia
+    let wakeLock = null;
+
+    // Configura aquí las variables que determinan si tu app necesita pantalla encendida
+    const wlState = {
+      connected: false,      // Ej: Bluetooth conectado
+      sessionActive: false,  // Ej: Cronómetro corriendo
+      fullscreen: false      // Ej: Video o dashboard en pantalla completa
+    };
+
+    // 2. Lógica de Decisión
+    function shouldHoldWakeLock() {
+      // La pantalla se mantiene encendida si hay conexión bluetooth
+      return wlState.connected || wlState.sessionActive || wlState.fullscreen;
+    }
+
+    // 3. Funciones Core
+    async function acquireWakeLockOnce() {
+      if (!('wakeLock' in navigator) || wakeLock) return;
+      try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('💡 Pantalla bloqueada (Wake Lock activo)');
+        
+        wakeLock.addEventListener('release', () => {
+          wakeLock = null;
+          console.log('💤 Wake Lock liberado por sistema');
+          if (document.visibilityState === 'visible' && shouldHoldWakeLock()) {
+            acquireWakeLockOnce().catch(() => {});
+          }
+        });
+      } catch (err) {
+        console.warn('⚠️ No se pudo activar Wake Lock:', err);
+      }
+    }
+
+    async function releaseWakeLockIfHeld() {
+      if (!wakeLock) return;
+      try {
+        await wakeLock.release();
+        console.log('💤 Wake Lock liberado manualmente');
+      } catch(e) { console.error(e); }
+      wakeLock = null;
+    }
+
+    async function syncWakeLock() {
+      if (document.visibilityState !== 'visible') return;
+      if (shouldHoldWakeLock()) {
+        await acquireWakeLockOnce();
+      } else {
+        await releaseWakeLockIfHeld();
+      }
+    }
+
+    // 4. Event Listeners Automáticos
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') syncWakeLock();
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      wlState.fullscreen = !!document.fullscreenElement;
+      syncWakeLock();
+    });
+
+    /* ==========================================================================
+       LÓGICA DE LA APP
+       ========================================================================== */
+
     // --- VARIABLES DE ESTADO ---
     let state = {
         mode: 'HIIT',       // HIIT | HYPER | FLOW
@@ -210,11 +289,11 @@
         connectedHR: false
     };
 
-    // --- CONFIGURACIÓN BLUETOOTH (Coincide con ESP32) ---
+    // --- CONFIGURACIÓN BLUETOOTH ---
     const ESP_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
     const ESP_CHAR_UUID    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
 
-    // --- LÓGICA CORE: EL ENTRENADOR INTELIGENTE ---
+    // --- LÓGICA CORE: EL ENTRENADOR ---
     function updateBioFeedback() {
         const msg = document.getElementById('main-msg');
         const sub = document.getElementById('sub-msg');
@@ -222,22 +301,18 @@
         const zone = document.getElementById('feedback-zone');
         const marker = document.getElementById('target-marker');
 
-        // Cálculo de % HR
         const hrPercent = state.hr > 0 ? (state.hr / state.maxHR) * 100 : 0;
 
-        // Limpieza de estilos previos
+        // Reset
         zone.style.borderColor = "#333";
         marker.style.display = "none";
 
-        // ----------------------------------------------------
-        // MODO 1: HIIT (Quema Grasa / Metabólico)
-        // Objetivo: Mantener HR alto. El "Squeeze" no importa tanto.
-        // ----------------------------------------------------
+        // MODO HIIT
         if (state.mode === 'HIIT') {
             if (hrPercent < 70) {
                 msg.innerText = "¡ACELERA! 🔥";
                 msg.style.color = "var(--warn)";
-                sub.innerText = "Sube pulsaciones (Zona Baja)";
+                sub.innerText = "Sube pulsaciones";
                 zone.style.borderColor = "var(--warn)";
             } else if (hrPercent > 92) {
                 msg.innerText = "¡BAJA RITMO! 🛑";
@@ -250,47 +325,38 @@
                 sub.innerText = "Zona Quema Grasa Óptima";
                 zone.style.borderColor = "var(--primary)";
             }
-            // Barra = Intensidad Cardíaca
             bar.style.width = hrPercent + "%";
             bar.style.background = hrPercent > 90 ? "var(--danger)" : "var(--primary)";
         }
 
-        // ----------------------------------------------------
-        // MODO 2: HIPERTROFIA (Construcción Muscular)
-        // Objetivo: Squeeze > 1.0s. Descanso si HR es alto.
-        // ----------------------------------------------------
+        // MODO HIPERTROFIA
         else if (state.mode === 'HYPER') {
-            marker.style.display = "block"; // Mostrar marca de 1s
+            marker.style.display = "block"; 
 
-            // A. Prioridad: ¿Necesita descansar?
             if (hrPercent > 75) {
                 msg.innerText = "RECUPERA 🛌";
                 msg.style.color = "#aaa";
-                sub.innerText = `Espera a que baje el pulso (${state.hr} bpm)`;
+                sub.innerText = `Baja pulsaciones (${state.hr} bpm)`;
                 bar.style.width = hrPercent + "%";
                 bar.style.background = "var(--warn)";
                 return; 
             }
 
-            // B. Evaluar la calidad de la última repetición
-            // Escala de barra: 0s a 2.0s (donde 1s es el 50%)
+            // Visualización del tiempo de squeeze
             let visualPercent = (state.lastSqueeze / 2.0) * 100;
             if(visualPercent > 100) visualPercent = 100;
             bar.style.width = visualPercent + "%";
 
             if (state.lastSqueeze < 0.2) {
-                // Estado inicial o error
                 msg.innerText = "DALE FUERTE 💪";
                 sub.innerText = "Sube y sostén arriba";
             } else if (state.lastSqueeze < 0.8) {
-                // Inercia / Muy rápido
                 msg.innerText = "¡MUY RÁPIDO! 🐢";
                 msg.style.color = "var(--danger)";
-                sub.innerText = "Controla la bajada. ¡Sin rebotes!";
+                sub.innerText = "Sostén al menos 1 segundo";
                 bar.style.background = "var(--danger)";
                 zone.style.borderColor = "var(--danger)";
             } else {
-                // Buena repetición
                 msg.innerText = "¡EXCELENTE! ⭐";
                 msg.style.color = "var(--success)";
                 sub.innerText = "Buena tensión mecánica";
@@ -299,26 +365,23 @@
             }
         }
 
-        // ----------------------------------------------------
-        // MODO 3: FLOW (Resistencia / Cardio Estable)
-        // Objetivo: Mantenerse en Zona 3 (70-80%).
-        // ----------------------------------------------------
+        // MODO FLOW
         else if (state.mode === 'FLOW') {
             const minZone = 70;
             const maxZone = 80;
 
             if (hrPercent < minZone) {
                 msg.innerText = "SUBE INTENSIDAD 🔼";
-                sub.innerText = "Estás debajo de la zona objetivo";
+                sub.innerText = "Objetivo: Zona Cardio";
                 zone.style.borderColor = "var(--primary)";
             } else if (hrPercent > maxZone) {
                 msg.innerText = "BAJA INTENSIDAD 🔽";
-                sub.innerText = "Estás encima de la zona objetivo";
+                sub.innerText = "Controla la respiración";
                 zone.style.borderColor = "var(--warn)";
             } else {
                 msg.innerText = "🌊 EN FLUJO 🌊";
                 msg.style.color = "var(--success)";
-                sub.innerText = "Ritmo cardíaco perfecto";
+                sub.innerText = "Ritmo perfecto";
                 zone.style.borderColor = "var(--success)";
             }
             bar.style.width = hrPercent + "%";
@@ -326,13 +389,13 @@
         }
     }
 
-    // --- CONEXIÓN BLUETOOTH: ESP32 (MÁQUINA) ---
+    // --- CONEXIÓN BLUETOOTH: MÁQUINA ---
     async function connectESP() {
         const btn = document.getElementById('btn-esp');
         try {
             btn.innerText = "⏳ Buscando...";
             const device = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'Ab' }], // Coincide con BLEDevice::init("Ab-Coaster Pro")
+                filters: [{ namePrefix: 'Ab' }],
                 optionalServices: [ESP_SERVICE_UUID]
             });
             
@@ -344,24 +407,35 @@
             char.addEventListener('characteristicvaluechanged', handleMachineData);
 
             state.connectedESP = true;
+            // ACTIVAR WAKE LOCK AL CONECTAR
+            wlState.connected = true; 
+            syncWakeLock();
+
             btn.classList.add('connected');
             btn.innerHTML = "<span>⚡ Conectado</span>";
             document.getElementById('sub-msg').innerText = "Máquina lista. ¡Empieza!";
 
         } catch (error) {
             console.error(error);
-            alert("Error conectando Máquina: " + error);
+            alert("Error conectando: " + error);
             btn.innerText = "⚡ Reintentar";
         }
     }
 
-    // Procesa los datos que vienen del Arduino (FLOAT 32)
+    // --- LÓGICA DE FILTRADO DE DATOS (Corrección de Inversión) ---
     function handleMachineData(event) {
         const dataView = event.target.value;
-        // IMPORTANTE: Leer Float32, Little Endian (true)
-        // El Arduino envía 4 bytes representando segundos (ej: 1.25)
         const seconds = dataView.getFloat32(0, true);
         
+        // --- FILTRO DE SEGURIDAD PARA INVERSIÓN ---
+        // Si el tiempo es mayor a 3 segundos, asumimos que es un DESCANSO 
+        // (el imán se quedó pegado o lejos mucho tiempo) y NO es una repetición de fuerza.
+        if (seconds > 3.0) {
+            console.log("Ignorado: Tiempo demasiado largo (" + seconds + "s) considerado descanso.");
+            return; // Salimos de la función sin contar la repetición
+        }
+
+        // Si pasa el filtro, es una repetición válida (< 3s)
         state.lastSqueeze = seconds;
         state.reps++;
 
@@ -369,7 +443,7 @@
         document.getElementById('val-sq').innerText = seconds.toFixed(2);
         document.getElementById('val-reps').innerText = state.reps;
 
-        // Feedback inmediato visual
+        // Feedback visual en la tarjeta
         const cardSq = document.getElementById('card-squeeze');
         cardSq.style.borderColor = "var(--primary)";
         setTimeout(() => cardSq.style.borderColor = "#333", 500);
@@ -377,7 +451,7 @@
         updateBioFeedback();
     }
 
-    // --- CONEXIÓN BLUETOOTH: RITMO CARDÍACO (GENÉRICO) ---
+    // --- CONEXIÓN BLUETOOTH: HEART RATE ---
     async function connectHR() {
         const btn = document.getElementById('btn-hr');
         try {
@@ -393,43 +467,40 @@
             char.addEventListener('characteristicvaluechanged', handleHRData);
 
             state.connectedHR = true;
+            // ACTIVAR WAKE LOCK TAMBIÉN AQUÍ
+            wlState.connected = true; 
+            syncWakeLock();
+
             btn.classList.add('connected');
             btn.innerHTML = "<span>❤️ Conectado</span>";
 
         } catch (error) {
             console.error(error);
-            alert("Error HR Monitor. Asegúrate que está puesto.");
             btn.innerText = "❤️ Reintentar";
         }
     }
 
     function handleHRData(event) {
         const value = event.target.value;
-        // Byte 0: Flags, Byte 1: Valor (usualmente uint8)
         const hr = value.getUint8(1);
-        
         state.hr = hr;
         document.getElementById('val-hr').innerText = hr;
-        
-        // El HR actualiza el feedback constantemente (para descansos o HIIT)
         updateBioFeedback();
     }
 
     // --- UTILIDADES UI ---
     function setMode(newMode) {
         state.mode = newMode;
-        
-        // Actualizar botones
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.classList.remove('active');
             if(btn.innerText.includes(newMode) || (newMode === 'HYPER' && btn.innerText.includes('HIPER'))) {
                 btn.classList.add('active');
             }
         });
-
-        // Reset visuales
         document.getElementById('main-msg').innerText = newMode + " ACTIVO";
         document.getElementById('sub-msg').innerText = "Haz una repetición para calibrar";
+        
+        // Resetear contador al cambiar de modo (opcional)
         state.reps = 0;
         document.getElementById('val-reps').innerText = "0";
         updateBioFeedback();
