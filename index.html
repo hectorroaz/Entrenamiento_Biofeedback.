@@ -3,509 +3,423 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AbSmart Bio-Link Pro</title>
+    <title>AbSmart Science</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* --- ESTILOS NEON / DARK MODE --- */
         :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #1a1a1a;
-            --primary: #00f2ff;   /* Cian */
-            --success: #00ff88;   /* Verde */
-            --warn: #ffcc00;      /* Amarillo */
-            --danger: #ff3355;    /* Rojo */
-            --text-main: #ffffff;
-            --text-dim: #888888;
-            --accent-reps: #d000ff; /* Un color morado neón para destacar las Reps */
+            --bg: #000000;
+            --card: #1c1c1e;
+            --text: #ffffff;
+            --z1: #3b82f6; /* Azul - Calentamiento */
+            --z2: #22c55e; /* Verde - Quema Grasa */
+            --z3: #eab308; /* Amarillo - Aeróbico */
+            --z4: #f97316; /* Naranja - Anaeróbico */
+            --z5: #ef4444; /* Rojo - Extremo */
         }
-
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
-            text-align: center;
-            height: 100vh;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
-
-        h1 { margin: 0 0 15px 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); }
-
-        /* --- DASHBOARD SUPERIOR (3 COLUMNAS) --- */
-        .metrics-grid {
-            display: grid;
-            /* CAMBIO VISUAL: 3 Columnas iguales */
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 10px 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid #333;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card-label { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .card-value { font-size: 1.8rem; font-weight: 700; line-height: 1; }
-        .card-unit { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px;}
-
-        /* Estilo especial para la tarjeta de Repeticiones */
-        #card-reps .card-value { color: var(--accent-reps); font-size: 2.2rem; }
-        #card-reps { border-color: #444; }
-
-        /* --- FEEDBACK CENTRAL (El Cerebro) --- */
-        .feedback-zone {
-            flex-grow: 1;
-            background: #000;
-            border-radius: 20px;
-            padding: 20px;
-            border: 2px solid #333;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
-        }
-
-        #main-msg { font-size: 1.8rem; font-weight: 800; margin: 0; text-transform: uppercase; z-index: 2; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        #sub-msg { color: var(--text-dim); margin-top: 10px; font-size: 1rem; z-index: 2; }
-
-        /* Barra de Progreso Dinámica */
-        .progress-container {
-            width: 100%;
-            height: 12px;
-            background: #333;
-            border-radius: 6px;
-            margin-top: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--primary);
-            transition: width 0.3s ease-out, background 0.3s;
-        }
-        /* Marcador de objetivo para Hipertrofia (1 segundo) */
-        .target-marker {
-            position: absolute;
-            left: 50%; /* Asumiendo escala de 2s, 1s es 50% */
-            top: 0; bottom: 0;
-            width: 2px;
-            background: white;
-            z-index: 5;
-            display: none; 
-        }
-
-        /* --- CONTROLES INFERIORES --- */
-        .controls { display: flex; flex-direction: column; gap: 15px; }
-
-        .mode-selector {
-            display: flex;
-            justify-content: center;
-            background: var(--card-bg);
-            padding: 5px;
-            border-radius: 50px;
-            border: 1px solid #333;
-        }
-
-        .mode-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            padding: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 40px;
-            transition: 0.3s;
-            font-size: 0.8rem;
-        }
-        .mode-btn.active { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
-
-        .conn-row { display: flex; gap: 10px; }
-        .btn-conn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: #333;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-conn.connected { background: var(--success); color: #000; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; text-align: center; }
         
+        /* HEADER & CONFIG */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .age-config { font-size: 0.8rem; background: #333; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+        input[type=number] { width: 40px; background: transparent; border: none; color: white; font-weight: bold; text-align: center; font-size: 1rem; border-bottom: 1px solid #555; }
+
+        /* INDICADOR DE ESTADO (Esquina Superior) */
+        .status-pill {
+            font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase;
+            background: #333; color: #777; transition: 0.2s;
+        }
+        .status-pill.up { background: var(--text); color: black; box-shadow: 0 0 10px white; }
+
+        /* GAUGE VISUAL (Canvas) */
+        .gauge-container { position: relative; width: 280px; height: 140px; margin: 0 auto 10px auto; }
+        canvas#gaugeCanvas { width: 100%; height: 100%; }
+        .gauge-data { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
+        .bpm-big { font-size: 3.5rem; font-weight: 800; line-height: 1; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .zone-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 5px; }
+
+        /* DASHBOARD METRICS */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .card { background: var(--card); border-radius: 12px; padding: 10px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; }
+        .lbl { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .val { font-size: 1.5rem; font-weight: 700; }
+        .timer-val { font-family: monospace; letter-spacing: -1px; color: var(--z3); }
+
+        /* FEEDBACK TEXT */
+        .feedback-box { background: #111; border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #555; text-align: left; min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
+        #fb-main { font-size: 1.2rem; font-weight: bold; margin-bottom: 4px; }
+        #fb-sub { font-size: 0.85rem; color: #aaa; }
+
+        /* CONTROLS */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #333; color: #fff; }
+        .btn.active { background: white; color: black; }
+        
+        .action-row { display: flex; gap: 10px; margin-top: auto; }
+        .btn-conn { flex: 2; background: var(--z1); color: white; padding: 15px; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; }
+        .btn-end { flex: 1; background: var(--z5); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; }
+
     </style>
 </head>
 <body>
 
-    <h1>AbSmart <span style="font-size:0.5em; vertical-align: middle; opacity: 0.5;">PRO</span></h1>
+    <div class="header">
+        <div class="age-config">
+            Edad: <input type="number" id="userAge" value="30" onchange="calculateZones()">
+        </div>
+        <div id="statusIndicator" class="status-pill">Abajo</div>
+    </div>
+
+    <div class="gauge-container">
+        <canvas id="gaugeCanvas"></canvas>
+        <div class="gauge-data">
+            <div class="bpm-big" id="hrValue">--</div>
+            <div class="zone-label" id="zoneLabel" style="color: #666;">Desconectado</div>
+        </div>
+    </div>
 
     <div class="metrics-grid">
-        <div class="card" id="card-reps">
-            <span class="card-label">Reps</span>
-            <span class="card-value" id="val-reps">0</span>
-            <span class="card-unit">Total</span>
+        <div class="card">
+            <span class="lbl">Repeticiones</span>
+            <span class="val" id="repValue" style="color:white">0</span>
         </div>
-
-        <div class="card" id="card-hr">
-            <span class="card-label">Pulso</span>
-            <span class="card-value" id="val-hr">--</span>
-            <span class="card-unit">BPM</span>
+        <div class="card">
+            <span class="lbl">Tiempo Sesión</span>
+            <span class="val timer-val" id="timerValue">00:00</span>
         </div>
-        
-        <div class="card" id="card-squeeze">
-            <span class="card-label">Pico</span>
-            <span class="card-value" id="val-sq">0.0</span>
-            <span class="card-unit">Seg</span>
+        <div class="card">
+            <span class="lbl">Último Pico</span>
+            <span class="val" id="squeezeValue">0.0s</span>
         </div>
     </div>
 
-    <div class="feedback-zone" id="feedback-zone">
-        <h2 id="main-msg">CONECTA SENSORES</h2>
-        <div id="sub-msg">Selecciona un modo para iniciar</div>
-        
-        <div class="progress-container">
-            <div class="target-marker" id="target-marker"></div>
-            <div class="progress-bar" id="p-bar"></div>
-        </div>
+    <div class="feedback-box" id="feedbackBox">
+        <div id="fb-main">Esperando conexión...</div>
+        <div id="fb-sub">Conecta los sensores para iniciar el entrenamiento científico.</div>
     </div>
 
-    <div class="controls">
-        <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('HIIT')">HIIT</button>
-            <button class="mode-btn" onclick="setMode('HYPER')">HIPERTROFIA</button>
-            <button class="mode-btn" onclick="setMode('FLOW')">FLOW</button>
-        </div>
+    <div class="btn-group">
+        <button class="btn active" onclick="setMode('HIIT')">HIIT</button>
+        <button class="btn" onclick="setMode('HYPER')">HIPERTROFIA</button>
+        <button class="btn" onclick="setMode('FLOW')">FLOW</button>
+    </div>
 
-        <div class="conn-row">
-            <button class="btn-conn" id="btn-esp" onclick="connectESP()">
-                <span>⚡ Máquina</span>
-            </button>
-            <button class="btn-conn" id="btn-hr" onclick="connectHR()">
-                <span>❤️ Pulso</span>
-            </button>
-        </div>
-        
-        <div style="font-size: 0.7rem; color: #444;">v2.0 - WakeLock Active</div>
+    <div class="action-row">
+        <button class="btn-conn" onclick="connectAll()">⚡ CONECTAR TODO</button>
+        <button class="btn-end" onclick="endSession()">🏁 FIN</button>
     </div>
 
 <script>
-    /* ==========================================================================
-       WAKE LOCK MANAGER (Integrado según solicitud)
-       ========================================================================== */
-    // 1. Estado y Referencia
-    let wakeLock = null;
-
-    // Configura aquí las variables que determinan si tu app necesita pantalla encendida
-    const wlState = {
-      connected: false,      // Ej: Bluetooth conectado
-      sessionActive: false,  // Ej: Cronómetro corriendo
-      fullscreen: false      // Ej: Video o dashboard en pantalla completa
-    };
-
-    // 2. Lógica de Decisión
-    function shouldHoldWakeLock() {
-      // La pantalla se mantiene encendida si hay conexión bluetooth
-      return wlState.connected || wlState.sessionActive || wlState.fullscreen;
-    }
-
-    // 3. Funciones Core
-    async function acquireWakeLockOnce() {
-      if (!('wakeLock' in navigator) || wakeLock) return;
-      try {
-        wakeLock = await navigator.wakeLock.request('screen');
-        console.log('💡 Pantalla bloqueada (Wake Lock activo)');
-        
-        wakeLock.addEventListener('release', () => {
-          wakeLock = null;
-          console.log('💤 Wake Lock liberado por sistema');
-          if (document.visibilityState === 'visible' && shouldHoldWakeLock()) {
-            acquireWakeLockOnce().catch(() => {});
-          }
-        });
-      } catch (err) {
-        console.warn('⚠️ No se pudo activar Wake Lock:', err);
-      }
-    }
-
-    async function releaseWakeLockIfHeld() {
-      if (!wakeLock) return;
-      try {
-        await wakeLock.release();
-        console.log('💤 Wake Lock liberado manualmente');
-      } catch(e) { console.error(e); }
-      wakeLock = null;
-    }
-
-    async function syncWakeLock() {
-      if (document.visibilityState !== 'visible') return;
-      if (shouldHoldWakeLock()) {
-        await acquireWakeLockOnce();
-      } else {
-        await releaseWakeLockIfHeld();
-      }
-    }
-
-    // 4. Event Listeners Automáticos
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') syncWakeLock();
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-      wlState.fullscreen = !!document.fullscreenElement;
-      syncWakeLock();
-    });
-
-    /* ==========================================================================
-       LÓGICA DE LA APP
-       ========================================================================== */
-
-    // --- VARIABLES DE ESTADO ---
+    // --- ESTADO GLOBAL Y REGISTRO ---
     let state = {
-        mode: 'HIIT',       // HIIT | HYPER | FLOW
-        hr: 0,              // Ritmo cardíaco actual
-        lastSqueeze: 0.0,   // Segundos en pico (última repetición)
-        reps: 0,            // Contador de repeticiones
-        maxHR: 190,         // Ajustar según edad (220 - edad)
-        connectedESP: false,
-        connectedHR: false
+        age: 30, maxHR: 190, hr: 0, reps: 0, lastSqueeze: 0, 
+        mode: 'HIIT', isUp: false,
+        sessionActive: false, startTime: 0, totalPauseTime: 0, lastPauseStart: 0,
+        lastActivityTime: 0
     };
 
-    // --- CONFIGURACIÓN BLUETOOTH ---
-    const ESP_SERVICE_UUID = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
-    const ESP_CHAR_UUID    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+    // Historial para exportar
+    let sessionLog = []; // { time: '00:01', hr: 120, event: 'rep', val: 1.2 }
 
-    // --- LÓGICA CORE: EL ENTRENADOR ---
-    function updateBioFeedback() {
-        const msg = document.getElementById('main-msg');
-        const sub = document.getElementById('sub-msg');
-        const bar = document.getElementById('p-bar');
-        const zone = document.getElementById('feedback-zone');
-        const marker = document.getElementById('target-marker');
+    // Zonas de color
+    const Z_COLORS = ["#3b82f6", "#22c55e", "#eab308", "#f97316", "#ef4444"];
+    
+    // --- INICIALIZACIÓN ---
+    calculateZones();
+    drawGauge(0);
+    setInterval(sessionTick, 1000); // Cronómetro
 
-        const hrPercent = state.hr > 0 ? (state.hr / state.maxHR) * 100 : 0;
-
-        // Reset
-        zone.style.borderColor = "#333";
-        marker.style.display = "none";
-
-        // MODO HIIT
-        if (state.mode === 'HIIT') {
-            if (hrPercent < 70) {
-                msg.innerText = "¡ACELERA! 🔥";
-                msg.style.color = "var(--warn)";
-                sub.innerText = "Sube pulsaciones";
-                zone.style.borderColor = "var(--warn)";
-            } else if (hrPercent > 92) {
-                msg.innerText = "¡BAJA RITMO! 🛑";
-                msg.style.color = "var(--danger)";
-                sub.innerText = "Pulsaciones al límite";
-                zone.style.borderColor = "var(--danger)";
-            } else {
-                msg.innerText = "¡MANTÉN RITMO! ⚡";
-                msg.style.color = "var(--primary)";
-                sub.innerText = "Zona Quema Grasa Óptima";
-                zone.style.borderColor = "var(--primary)";
-            }
-            bar.style.width = hrPercent + "%";
-            bar.style.background = hrPercent > 90 ? "var(--danger)" : "var(--primary)";
-        }
-
-        // MODO HIPERTROFIA
-        else if (state.mode === 'HYPER') {
-            marker.style.display = "block"; 
-
-            if (hrPercent > 75) {
-                msg.innerText = "RECUPERA 🛌";
-                msg.style.color = "#aaa";
-                sub.innerText = `Baja pulsaciones (${state.hr} bpm)`;
-                bar.style.width = hrPercent + "%";
-                bar.style.background = "var(--warn)";
-                return; 
-            }
-
-            // Visualización del tiempo de squeeze
-            let visualPercent = (state.lastSqueeze / 2.0) * 100;
-            if(visualPercent > 100) visualPercent = 100;
-            bar.style.width = visualPercent + "%";
-
-            if (state.lastSqueeze < 0.2) {
-                msg.innerText = "DALE FUERTE 💪";
-                sub.innerText = "Sube y sostén arriba";
-            } else if (state.lastSqueeze < 0.8) {
-                msg.innerText = "¡MUY RÁPIDO! 🐢";
-                msg.style.color = "var(--danger)";
-                sub.innerText = "Sostén al menos 1 segundo";
-                bar.style.background = "var(--danger)";
-                zone.style.borderColor = "var(--danger)";
-            } else {
-                msg.innerText = "¡EXCELENTE! ⭐";
-                msg.style.color = "var(--success)";
-                sub.innerText = "Buena tensión mecánica";
-                bar.style.background = "var(--success)";
-                zone.style.borderColor = "var(--success)";
-            }
-        }
-
-        // MODO FLOW
-        else if (state.mode === 'FLOW') {
-            const minZone = 70;
-            const maxZone = 80;
-
-            if (hrPercent < minZone) {
-                msg.innerText = "SUBE INTENSIDAD 🔼";
-                sub.innerText = "Objetivo: Zona Cardio";
-                zone.style.borderColor = "var(--primary)";
-            } else if (hrPercent > maxZone) {
-                msg.innerText = "BAJA INTENSIDAD 🔽";
-                sub.innerText = "Controla la respiración";
-                zone.style.borderColor = "var(--warn)";
-            } else {
-                msg.innerText = "🌊 EN FLUJO 🌊";
-                msg.style.color = "var(--success)";
-                sub.innerText = "Ritmo perfecto";
-                zone.style.borderColor = "var(--success)";
-            }
-            bar.style.width = hrPercent + "%";
-            bar.style.background = (hrPercent >= minZone && hrPercent <= maxZone) ? "var(--success)" : "#555";
-        }
+    function calculateZones() {
+        state.age = document.getElementById('userAge').value;
+        state.maxHR = 220 - state.age;
+        console.log("Max HR Recalculado:", state.maxHR);
     }
 
-    // --- CONEXIÓN BLUETOOTH: MÁQUINA ---
-    async function connectESP() {
-        const btn = document.getElementById('btn-esp');
-        try {
-            btn.innerText = "⏳ Buscando...";
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ namePrefix: 'Ab' }],
-                optionalServices: [ESP_SERVICE_UUID]
-            });
-            
-            const server = await device.gatt.connect();
-            const service = await server.getPrimaryService(ESP_SERVICE_UUID);
-            const char = await service.getCharacteristic(ESP_CHAR_UUID);
-            
-            await char.startNotifications();
-            char.addEventListener('characteristicvaluechanged', handleMachineData);
+    // --- LOGICA DE CRONÓMETRO Y AUTO-PAUSA ---
+    function sessionTick() {
+        if (!state.sessionActive) return;
 
-            state.connectedESP = true;
-            // ACTIVAR WAKE LOCK AL CONECTAR
-            wlState.connected = true; 
-            syncWakeLock();
-
-            btn.classList.add('connected');
-            btn.innerHTML = "<span>⚡ Conectado</span>";
-            document.getElementById('sub-msg').innerText = "Máquina lista. ¡Empieza!";
-
-        } catch (error) {
-            console.error(error);
-            alert("Error conectando: " + error);
-            btn.innerText = "⚡ Reintentar";
+        // Auto-Pausa tras 30s de inactividad
+        if (Date.now() - state.lastActivityTime > 30000) {
+            pauseSession();
+            return;
         }
-    }
 
-    // --- LÓGICA DE FILTRADO DE DATOS (Corrección de Inversión) ---
-    function handleMachineData(event) {
-        const dataView = event.target.value;
-        const seconds = dataView.getFloat32(0, true);
+        const elapsed = Date.now() - state.startTime - state.totalPauseTime;
+        const totalSecs = Math.floor(elapsed / 1000);
+        const m = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+        const s = (totalSecs % 60).toString().padStart(2, '0');
+        document.getElementById('timerValue').innerText = `${m}:${s}`;
         
-        // --- FILTRO DE SEGURIDAD PARA INVERSIÓN ---
-        // Si el tiempo es mayor a 3 segundos, asumimos que es un DESCANSO 
-        // (el imán se quedó pegado o lejos mucho tiempo) y NO es una repetición de fuerza.
-        if (seconds > 3.0) {
-            console.log("Ignorado: Tiempo demasiado largo (" + seconds + "s) considerado descanso.");
-            return; // Salimos de la función sin contar la repetición
+        // Loguear datos cada segundo si hay HR
+        if (state.hr > 0) {
+            sessionLog.push({ t: totalSecs, hr: state.hr, type: 'status' });
         }
+    }
 
-        // Si pasa el filtro, es una repetición válida (< 3s)
-        state.lastSqueeze = seconds;
-        state.reps++;
+    function startSession() {
+        if (!state.sessionActive) {
+            if (state.startTime === 0) {
+                // Primer inicio
+                state.startTime = Date.now();
+                state.lastActivityTime = Date.now();
+                sessionLog = []; // Reset log
+                console.log("Sesión Iniciada");
+            } else {
+                // Reanudar
+                const pausedDuration = Date.now() - state.lastPauseStart;
+                state.totalPauseTime += pausedDuration;
+                console.log("Sesión Reanudada");
+            }
+            state.sessionActive = true;
+            document.getElementById('timerValue').style.opacity = "1";
+        }
+        state.lastActivityTime = Date.now(); // Reset timeout
+    }
 
+    function pauseSession() {
+        if (state.sessionActive) {
+            state.sessionActive = false;
+            state.lastPauseStart = Date.now();
+            document.getElementById('timerValue').style.opacity = "0.5";
+            updateFeedback("EN PAUSA", "Mueve la máquina para reanudar");
+        }
+    }
+
+    // --- BLUETOOTH (Simplificado para conectar ambos) ---
+    async function connectAll() {
+        try {
+            // 1. ESP32
+            const device1 = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'Ab' }], optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'] });
+            const server1 = await device1.gatt.connect();
+            const service1 = await server1.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+            const char1 = await service1.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+            await char1.startNotifications();
+            char1.addEventListener('characteristicvaluechanged', handleESPData);
+            
+            // 2. HR Monitor (Si el usuario lo selecciona en la segunda ventana del navegador)
+            // Nota: El navegador suele pedir permisos uno por uno.
+            alert("Ahora selecciona tu banda cardíaca / reloj.");
+            const device2 = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
+            const server2 = await device2.gatt.connect();
+            const service2 = await server2.getPrimaryService('heart_rate');
+            const char2 = await service2.getCharacteristic('heart_rate_measurement');
+            await char2.startNotifications();
+            char2.addEventListener('characteristicvaluechanged', handleHRData);
+
+            document.querySelector('.btn-conn').innerText = "✅ CONECTADO";
+            document.querySelector('.btn-conn').style.background = "#22c55e";
+            wakeLockOn(); // Mantener pantalla encendida
+
+        } catch (e) {
+            console.error(e);
+            alert("Conexión incompleta o cancelada. Intenta de nuevo.");
+        }
+    }
+
+    // --- PROCESAMIENTO DE DATOS ---
+    function handleESPData(e) {
+        const val = e.target.value.getFloat32(0, true);
+        
+        startSession(); // Cualquier movimiento activa la sesión
+
+        // 0.0 significa que el imán se activó (ARRIBA)
+        if (val === 0.0) {
+            state.isUp = true;
+            document.getElementById('statusIndicator').innerText = "💪 ARRIBA";
+            document.getElementById('statusIndicator').classList.add('up');
+        } 
+        // Valor > 0 es el tiempo final (BAJADA/Rep completa)
+        else if (val > 0) {
+            state.isUp = false;
+            document.getElementById('statusIndicator').innerText = "ABAJO";
+            document.getElementById('statusIndicator').classList.remove('up');
+            
+            // Validar repetición según lógica
+            processRep(val);
+        }
+    }
+
+    function handleHRData(e) {
+        const val = e.target.value.getUint8(1);
+        state.hr = val;
+        
+        // Calcular Zona (1-5)
+        const pct = (state.hr / state.maxHR);
+        let zoneIdx = 0;
+        if (pct >= 0.9) zoneIdx = 4;
+        else if (pct >= 0.8) zoneIdx = 3;
+        else if (pct >= 0.7) zoneIdx = 2;
+        else if (pct >= 0.6) zoneIdx = 1;
+        
         // Actualizar UI
-        document.getElementById('val-sq').innerText = seconds.toFixed(2);
-        document.getElementById('val-reps').innerText = state.reps;
+        document.getElementById('hrValue').innerText = val;
+        document.getElementById('hrValue').style.color = Z_COLORS[zoneIdx];
+        document.getElementById('zoneLabel').innerText = `Zona ${zoneIdx + 1} (${Math.round(pct*100)}%)`;
+        document.getElementById('zoneLabel').style.color = Z_COLORS[zoneIdx];
+        
+        drawGauge(pct);
+        updateBioFeedback(); // Chequear lógica científica
+    }
 
-        // Feedback visual en la tarjeta
-        const cardSq = document.getElementById('card-squeeze');
-        cardSq.style.borderColor = "var(--primary)";
-        setTimeout(() => cardSq.style.borderColor = "#333", 500);
+    function processRep(duration) {
+        state.reps++;
+        state.lastSqueeze = duration;
+        document.getElementById('repValue').innerText = state.reps;
+        document.getElementById('squeezeValue').innerText = duration.toFixed(1) + "s";
+        
+        // Guardar para el reporte
+        const elapsed = Math.floor((Date.now() - state.startTime - state.totalPauseTime) / 1000);
+        sessionLog.push({ t: elapsed, type: 'rep', val: duration });
 
         updateBioFeedback();
     }
 
-    // --- CONEXIÓN BLUETOOTH: HEART RATE ---
-    async function connectHR() {
-        const btn = document.getElementById('btn-hr');
-        try {
-            btn.innerText = "⏳ Buscando...";
-            const device = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ['heart_rate'] }]
-            });
-            const server = await device.gatt.connect();
-            const service = await server.getPrimaryService('heart_rate');
-            const char = await service.getCharacteristic('heart_rate_measurement');
-            
-            await char.startNotifications();
-            char.addEventListener('characteristicvaluechanged', handleHRData);
+    // --- EL CEREBRO DE ENTRENAMIENTO (LOGICA ACTUALIZADA) ---
+    function updateBioFeedback() {
+        const fbMain = document.getElementById('fb-main');
+        const fbSub = document.getElementById('fb-sub');
+        const box = document.getElementById('feedbackBox');
+        
+        const pct = state.hr / state.maxHR;
 
-            state.connectedHR = true;
-            // ACTIVAR WAKE LOCK TAMBIÉN AQUÍ
-            wlState.connected = true; 
-            syncWakeLock();
-
-            btn.classList.add('connected');
-            btn.innerHTML = "<span>❤️ Conectado</span>";
-
-        } catch (error) {
-            console.error(error);
-            btn.innerText = "❤️ Reintentar";
+        if (state.mode === 'HIIT') {
+            if (pct < 0.7) { 
+                updateFeedback("¡ACELERA!", "Sube pulsaciones a Zona Naranja/Roja", "#eab308");
+            } else if (pct > 0.92) {
+                updateFeedback("ALTO RIESGO", "Baja un poco el ritmo, estás al límite", "#ef4444");
+            } else {
+                updateFeedback("RITMO PERFECTO", "Mantén esta intensidad quemagrasa", "#22c55e");
+            }
+        } 
+        else if (state.mode === 'HYPER') {
+            // Lógica Rest-Pause
+            if (pct > 0.75) {
+                updateFeedback("DESCANSANDO...", `Espera a bajar a Zona Azul (<${Math.round(state.maxHR*0.6)} bpm)`, "#3b82f6");
+            } else {
+                if (state.lastSqueeze < 1.0 && state.reps > 0) {
+                    updateFeedback("SUBIDA RÁPIDA", "Sostén al menos 1 segundo arriba para hipertrofia", "#f97316");
+                } else {
+                    updateFeedback("MODO FUERZA", "Ejecuta lento y controlado", "#22c55e");
+                }
+            }
+        }
+        else if (state.mode === 'FLOW') {
+            if (pct < 0.6) updateFeedback("SUBE INTENSIDAD", "Entra en zona aeróbica", "#3b82f6");
+            else if (pct > 0.8) updateFeedback("BAJA INTENSIDAD", "Estás saliendo de la zona de flujo", "#f97316");
+            else updateFeedback("FLOW STATE 🌊", "Respiración y movimiento sincronizados", "#22c55e");
         }
     }
 
-    function handleHRData(event) {
-        const value = event.target.value;
-        const hr = value.getUint8(1);
-        state.hr = hr;
-        document.getElementById('val-hr').innerText = hr;
-        updateBioFeedback();
+    function updateFeedback(main, sub, color) {
+        const box = document.getElementById('feedbackBox');
+        document.getElementById('fb-main').innerText = main;
+        document.getElementById('fb-sub').innerText = sub;
+        box.style.borderLeftColor = color;
+        document.getElementById('fb-main').style.color = color;
     }
 
-    // --- UTILIDADES UI ---
-    function setMode(newMode) {
-        state.mode = newMode;
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if(btn.innerText.includes(newMode) || (newMode === 'HYPER' && btn.innerText.includes('HIPER'))) {
-                btn.classList.add('active');
-            }
-        });
-        document.getElementById('main-msg').innerText = newMode + " ACTIVO";
-        document.getElementById('sub-msg').innerText = "Haz una repetición para calibrar";
+    function setMode(m) {
+        state.mode = m;
+        document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        state.reps = 0; // Reset visual reps (opcional)
+        document.getElementById('repValue').innerText = "0";
+        updateFeedback("MODO " + m, "Comienza para calibrar sensor", "#fff");
+    }
+
+    // --- CANVAS GAUGE (GRAFICO SEMICIRCULO) ---
+    function drawGauge(pct) {
+        const cvs = document.getElementById('gaugeCanvas');
+        const ctx = cvs.getContext('2d');
+        const W = cvs.width = 300; 
+        const H = cvs.height = 150;
         
-        // Resetear contador al cambiar de modo (opcional)
-        state.reps = 0;
-        document.getElementById('val-reps').innerText = "0";
-        updateBioFeedback();
+        ctx.clearRect(0,0,W,H);
+        
+        // Fondo Gris
+        ctx.beginPath();
+        ctx.arc(W/2, H, 130, Math.PI, 0);
+        ctx.lineWidth = 20;
+        ctx.strokeStyle = "#333";
+        ctx.stroke();
+
+        // Zonas de Color
+        if (pct > 1) pct = 1;
+        const endAngle = Math.PI + (Math.PI * pct);
+        
+        // Gradiente dinámico según intensidad
+        let color = Z_COLORS[0];
+        if(pct > 0.6) color = Z_COLORS[1];
+        if(pct > 0.7) color = Z_COLORS[2];
+        if(pct > 0.8) color = Z_COLORS[3];
+        if(pct > 0.9) color = Z_COLORS[4];
+
+        ctx.beginPath();
+        ctx.arc(W/2, H, 130, Math.PI, endAngle);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+
+        // Icono de pesa (Visual extra)
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText("🏋️", W/2 - 15, H - 40);
+    }
+
+    // --- WAKE LOCK ---
+    async function wakeLockOn() {
+        try { await navigator.wakeLock.request('screen'); } catch(e){}
+    }
+
+    // --- EXPORTAR REPORTE HTML ---
+    function endSession() {
+        if(!confirm("¿Finalizar sesión y descargar reporte?")) return;
+        
+        // Crear Reporte
+        const date = new Date().toLocaleString();
+        const avgHR = Math.round(sessionLog.filter(d => d.type === 'status').reduce((a,b)=>a+b.hr,0) / (sessionLog.length||1));
+        const htmlContent = `
+        <html>
+        <head><title>Reporte AbSmart</title>
+        <style>body{font-family:sans-serif;padding:20px;background:#f0f2f5} .box{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 5px rgba(0,0,0,0.1)} h1{color:#333}</style>
+        </head>
+        <body>
+            <h1>Reporte de Entrenamiento AbSmart</h1>
+            <div class="box">
+                <p><strong>Fecha:</strong> ${date}</p>
+                <p><strong>Modo:</strong> ${state.mode}</p>
+                <p><strong>Reps Totales:</strong> ${state.reps}</p>
+                <p><strong>Pulso Promedio:</strong> ${avgHR} bpm</p>
+                <p><strong>Duración:</strong> ${document.getElementById('timerValue').innerText}</p>
+            </div>
+            <div class="box">
+                <canvas id="chart"></canvas>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
+            <script>
+                const data = ${JSON.stringify(sessionLog)};
+                const labels = data.map(d => d.t + 's');
+                const hrs = data.map(d => d.hr > 0 ? d.hr : null);
+                const reps = data.map(d => d.type === 'rep' ? d.val * 10 : null); // Escalar rep para ver en grafico
+
+                new Chart(document.getElementById('chart'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Frecuencia Cardíaca', data: hrs, borderColor: 'red', tension: 0.4 },
+                            { label: 'Repeticiones (Escalada)', data: reps, type: 'bar', backgroundColor: 'blue' }
+                        ]
+                    }
+                });
+            <\/script>
+        </body></html>`;
+
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `AbSmart_Reporte_${Date.now()}.html`;
+        link.click();
     }
 </script>
-
 </body>
 </html>
