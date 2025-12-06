@@ -3,52 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AbSmart Science v4.2</title>
+    <title>AbSmart Science v4.3</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #000000;
             --card: #1c1c1e;
             --text: #ffffff;
-            --z0: #6b7280; /* Gris */
-            --z1: #3b82f6; /* Azul */
-            --z2: #22c55e; /* Verde */
-            --z3: #eab308; /* Amarillo */
-            --z4: #f97316; /* Naranja */
-            --z5: #ef4444; /* Rojo */
+            --z0: #6b7280;
+            --z1: #3b82f6;
+            --z2: #22c55e;
+            --z3: #eab308;
+            --z4: #f97316;
+            --z5: #ef4444;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; text-align: center; }
         
-        /* HEADER */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; gap: 5px; }
-        .config-box { font-size: 0.8rem; background: #333; padding: 5px 8px; border-radius: 8px; display: flex; align-items: center; gap: 5px; flex-grow: 1; justify-content: center; height: 32px;}
+        /* HEADER MEJORADO */
+        .header-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; margin-bottom: 10px; gap: 8px; }
+        
+        /* Contenedor central de configuración */
+        .config-group { display: flex; gap: 5px; justify-content: center; }
+        
+        .config-box { font-size: 0.8rem; background: #333; padding: 5px 8px; border-radius: 8px; display: flex; align-items: center; gap: 5px; height: 36px;}
         input[type=number] { width: 30px; background: transparent; border: none; color: var(--z2); font-weight: bold; text-align: center; font-size: 0.9rem; border-bottom: 1px solid #555; }
-        select.zone-selector { background: transparent; color: white; border: none; font-weight: bold; font-size: 0.75rem; text-align: center; width: 100%; outline: none; }
+        select.zone-selector { background: transparent; color: white; border: none; font-weight: bold; font-size: 0.75rem; text-align: center; width: 80px; outline: none; }
         option { background: #333; color: white; }
 
-        .btn-icon { background: #333; border: none; color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;}
-        
-        /* FEEDBACK (Arriba) */
-        .feedback-box { background: #111; border-radius: 15px; padding: 8px; margin: 5px 0 5px 0; border: 2px solid #333; text-align: center; min-height: 45px; display: flex; flex-direction: column; justify-content: center; transition: border-color 0.3s; }
+        .btn-icon { background: #333; border: none; color: white; width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;}
+
+        /* NUEVO BOTON DE ESTADO (ARRIBA/ABAJO) */
+        .status-btn {
+            font-size: 0.8rem; font-weight: 800; padding: 0 15px; height: 40px; 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; text-transform: uppercase; 
+            background: #444; color: #aaa; transition: 0.2s;
+            cursor: pointer; border: 2px solid #555;
+            min-width: 80px;
+        }
+        /* Estado Activo (ABAJO/SQUEEZE) */
+        .status-btn.active { background: var(--z2); color: black; border-color: var(--z2); box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+        /* Estado Reposo (ARRIBA) */
+        .status-btn.rest { background: white; color: black; border-color: white; }
+
+        /* FEEDBACK */
+        .feedback-box { background: #111; border-radius: 15px; padding: 8px; margin: 0 0 10px 0; border: 2px solid #333; text-align: center; min-height: 45px; display: flex; flex-direction: column; justify-content: center; transition: border-color 0.3s; }
         #fb-main { font-size: 1.2rem; font-weight: 900; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
         #fb-sub { font-size: 0.8rem; color: #aaa; }
 
-        /* INDICADOR ARRIBA/ABAJO (Reubicado debajo de feedback) */
-        .status-pill { width: 120px; margin: 0 auto 10px auto; font-size: 0.7rem; font-weight: 800; padding: 0 10px; height: 28px; display: flex; align-items: center; border-radius: 6px; text-transform: uppercase; background: #222; color: #555; transition: 0.2s; justify-content: center;}
-        .status-pill.up { background: white; color: black; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
-
         /* GAUGE */
-        .gauge-container { position: relative; width: 280px; height: 140px; margin: 0 auto 10px auto; }
+        .gauge-container { position: relative; width: 260px; height: 130px; margin: 0 auto 5px auto; }
         canvas#gaugeCanvas { width: 100%; height: 100%; }
         .gauge-data { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
         .bpm-big { font-size: 3.5rem; font-weight: 800; line-height: 1; text-shadow: 0 0 20px rgba(0,0,0,0.5); }
         .zone-label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 5px; }
 
-        /* METRICAS */
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .card { background: var(--card); border-radius: 12px; padding: 10px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; }
-        .lbl { font-size: 0.65rem; color: #888; text-transform: uppercase; }
-        .val { font-size: 1.4rem; font-weight: 700; }
+        /* METRICAS - AHORA 2x2 */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .card { background: var(--card); border-radius: 12px; padding: 12px 5px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; }
+        .lbl { font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 3px; }
+        .val { font-size: 1.5rem; font-weight: 700; }
         .timer-val { font-family: monospace; letter-spacing: -1px; color: var(--z3); }
 
         /* CONEXIONES */
@@ -58,7 +72,7 @@
 
         /* BOTONES MODOS */
         .btn-group { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #333; color: #aaa; font-size: 0.8rem; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; background: #333; color: #aaa; font-size: 0.75rem; }
         .btn.active { background: white; color: black; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
         
         /* FIN */
@@ -69,32 +83,38 @@
 <body>
 
     <div class="header-row">
+        <!-- Izquierda: Fullscreen -->
         <button class="btn-icon" onclick="toggleFullscreen()">⛶</button>
         
-        <div class="config-box">
-            Edad: <input type="number" id="userAge" value="33" onchange="calculateZones()">
+        <!-- Centro: Configuraciones -->
+        <div class="config-group">
+            <div class="config-box">
+                Edad: <input type="number" id="userAge" value="33" onchange="calculateZones()">
+            </div>
+            <div class="config-box">
+                🎯 <select id="targetZoneSelect" class="zone-selector" onchange="updateBioFeedback()">
+                    <option value="auto">Auto</option>
+                    <option value="1">Z1</option>
+                    <option value="2">Z2</option>
+                    <option value="3">Z3</option>
+                    <option value="4">Z4</option>
+                    <option value="5">Z5</option>
+                </select>
+            </div>
         </div>
-        
-        <div class="config-box">
-            🎯 <select id="targetZoneSelect" class="zone-selector" onchange="updateBioFeedback()">
-                <option value="auto">Auto</option>
-                <option value="1">Zona 1</option>
-                <option value="2">Zona 2</option>
-                <option value="3">Zona 3</option>
-                <option value="4">Zona 4</option>
-                <option value="5">Zona 5</option>
-            </select>
+
+        <!-- Derecha: Botón Estado (Manual/Indicador) -->
+        <div id="statusBtn" class="status-btn rest" onclick="toggleManualState()">
+            ARRIBA
         </div>
     </div>
 
-    <!-- FEEDBACK + INDICADOR DEBAJO -->
+    <!-- FEEDBACK -->
     <div class="feedback-box" id="feedbackBox">
         <div id="fb-main">LISTO</div>
         <div id="fb-sub">Selecciona modo o conecta sensores</div>
     </div>
     
-    <div id="statusIndicator" class="status-pill">ABAJO</div>
-
     <div class="gauge-container">
         <canvas id="gaugeCanvas"></canvas>
         <div class="gauge-data">
@@ -103,15 +123,15 @@
         </div>
     </div>
 
-    <div class="conn-row" id="connectionRow">
-        <button class="btn-conn" id="btn-esp" onclick="connectMachine()">🔌 MÁQUINA</button>
-        <button class="btn-conn" id="btn-hr" onclick="connectHR()">❤️ CARDIO</button>
-    </div>
-
+    <!-- METRICAS 2x2 -->
     <div class="metrics-grid">
         <div class="card">
             <span class="lbl">Repeticiones</span>
             <span class="val" id="repValue" style="color:white">0</span>
+        </div>
+        <div class="card">
+            <span class="lbl">Reps / Min</span>
+            <span class="val" id="rpmValue" style="color:var(--z1)">0.0</span>
         </div>
         <div class="card">
             <span class="lbl">Tiempo Sesión</span>
@@ -121,6 +141,11 @@
             <span class="lbl">Squeeze (seg)</span>
             <span class="val" id="squeezeValue">0.0</span>
         </div>
+    </div>
+
+    <div class="conn-row" id="connectionRow">
+        <button class="btn-conn" id="btn-esp" onclick="connectMachine()">🔌 MÁQUINA</button>
+        <button class="btn-conn" id="btn-hr" onclick="connectHR()">❤️ CARDIO</button>
     </div>
 
     <div class="btn-group">
@@ -136,7 +161,6 @@
        WAKE LOCK MANAGER
        ========================================================================== */
     let wakeLock = null;
-    function shouldHoldWakeLock() { return true; }
     async function acquireWakeLockOnce() {
       if (!('wakeLock' in navigator) || wakeLock) return;
       try {
@@ -167,7 +191,7 @@
 
     let state = {
         age: 33, maxHR: 187, hr: 0, reps: 0, lastSqueeze: 0, 
-        mode: 'HIIT', isUp: false,
+        mode: 'HIIT', isUp: true,
         sessionActive: false, startTime: 0, totalPauseTime: 0, lastPauseStart: 0, lastActivityTime: 0
     };
 
@@ -183,7 +207,6 @@
         state.age = document.getElementById('userAge').value;
         state.maxHR = 220 - state.age;
         
-        // Actualizar Select con Rangos
         const sel = document.getElementById('targetZoneSelect');
         const ranges = [
             {l: 'Zona 1', min: 0.5, max: 0.6},
@@ -193,14 +216,11 @@
             {l: 'Zona 5', min: 0.9, max: 1.0}
         ];
         
-        // Mantener el indice 0 como Auto, actualizar 1-5
         for(let i=0; i<ranges.length; i++){
             const minBPM = Math.round(state.maxHR * ranges[i].min);
             const maxBPM = Math.round(state.maxHR * ranges[i].max);
-            // El option index es i+1 porque el 0 es Auto
-            sel.options[i+1].text = `${ranges[i].l} (${minBPM}-${maxBPM})`;
+            sel.options[i+1].text = `Z${i+1} (${minBPM}-${maxBPM})`;
         }
-
         updateBioFeedback(); 
     }
 
@@ -213,12 +233,24 @@
             return;
         }
 
-        const elapsed = Date.now() - state.startTime - state.totalPauseTime;
-        const totalSecs = Math.floor(elapsed / 1000);
+        const elapsedMs = Date.now() - state.startTime - state.totalPauseTime;
+        const totalSecs = Math.floor(elapsedMs / 1000);
         const m = Math.floor(totalSecs / 60).toString().padStart(2, '0');
         const s = (totalSecs % 60).toString().padStart(2, '0');
         document.getElementById('timerValue').innerText = `${m}:${s}`;
         
+        // CALCULO DE RPM (Reps por Minuto)
+        // Evitamos división por cero o valores muy locos al principio
+        let mins = elapsedMs / 60000;
+        let rpm = 0;
+        if (mins > 0.1) {
+            rpm = (state.reps / mins).toFixed(1);
+        } else {
+            rpm = (state.reps * (1/mins)).toFixed(1); // Proyección inicial (puede ser alta)
+            if(mins < 0.01) rpm = 0;
+        }
+        document.getElementById('rpmValue').innerText = rpm;
+
         if (state.hr > 0) sessionLog.push({ t: totalSecs, hr: state.hr, type: 'status' });
     }
 
@@ -244,6 +276,63 @@
             updateFeedback("EN PAUSA", "Mueve la máquina para reanudar", "#888");
         }
     }
+
+    /* ==========================================================================
+       MANEJO DE ESTADO (MANUAL Y SENSOR)
+       ========================================================================== */
+
+    // Función centralizada para procesar movimiento
+    // val: 0.0 (ARRIBA/REPOSO), >0.0 (ABAJO/SQUEEZE)
+    function processMovement(val) {
+        startSession();
+        const btn = document.getElementById('statusBtn');
+
+        if (val === 0.0) {
+            // ESTADO: ARRIBA
+            state.isUp = true;
+            btn.innerText = "ARRIBA";
+            btn.className = "status-btn rest"; // Blanco
+        } else {
+            // ESTADO: ABAJO
+            if (state.isUp) {
+                // Transición de Arriba a Abajo -> Contar Rep
+                state.reps++;
+                document.getElementById('repValue').innerText = state.reps;
+                const elapsed = Math.floor((Date.now() - state.startTime - state.totalPauseTime) / 1000);
+                sessionLog.push({ t: elapsed, type: 'rep', val: val });
+            }
+            
+            state.isUp = false;
+            state.lastSqueeze = val;
+            
+            btn.innerText = "ABAJO";
+            btn.className = "status-btn active"; // Verde/Activo
+
+            // Si es un valor real del sensor, actualizar squeeze
+            // Si es manual, no actualizamos el squeeze value numérico o ponemos 1.0 ficticio
+            if (val !== 1.0) { 
+                document.getElementById('squeezeValue').innerText = val.toFixed(1);
+            }
+            
+            updateBioFeedback();
+        }
+    }
+
+    // Toggle Manual (Click en el botón)
+    function toggleManualState() {
+        // Invierte el estado actual
+        if (state.isUp) {
+            // Estaba Arriba, forzar Abajo (Simular valor 1.0)
+            processMovement(1.0);
+        } else {
+            // Estaba Abajo, forzar Arriba (Simular valor 0.0)
+            processMovement(0.0);
+        }
+    }
+
+    /* ==========================================================================
+       CONEXIONES BLUETOOTH
+       ========================================================================== */
 
     function checkConnections() {
         const btnEsp = document.getElementById('btn-esp');
@@ -304,26 +393,7 @@
 
     function handleESPData(e) {
         const val = e.target.value.getFloat32(0, true);
-        startSession(); 
-
-        if (val === 0.0) {
-            state.isUp = true;
-            document.getElementById('statusIndicator').innerText = "ARRIBA";
-            document.getElementById('statusIndicator').classList.add('up');
-        } else if (val > 0) {
-            state.isUp = false;
-            document.getElementById('statusIndicator').innerText = "ABAJO";
-            document.getElementById('statusIndicator').classList.remove('up');
-            
-            state.reps++;
-            state.lastSqueeze = val;
-            document.getElementById('repValue').innerText = state.reps;
-            document.getElementById('squeezeValue').innerText = val.toFixed(1);
-            
-            const elapsed = Math.floor((Date.now() - state.startTime - state.totalPauseTime) / 1000);
-            sessionLog.push({ t: elapsed, type: 'rep', val: val });
-            updateBioFeedback();
-        }
+        processMovement(val);
     }
 
     function handleHRData(e) {
@@ -387,7 +457,7 @@
         else if (state.mode === 'HYPER') {
             if (pct > 0.75) updateFeedback("RECUPERA...", `Baja pulsaciones`, Z_COLORS[1]);
             else {
-                if (state.lastSqueeze < 1.0 && state.reps > 0) updateFeedback("SUBIDA RÁPIDA", "Sostén 1 seg arriba", Z_COLORS[4]);
+                if (state.lastSqueeze < 1.0 && state.reps > 0 && !state.isUp) updateFeedback("SUBIDA RÁPIDA", "Sostén 1 seg arriba", Z_COLORS[4]);
                 else updateFeedback("MODO FUERZA 💪", "Control total", Z_COLORS[2]);
             }
         }
@@ -447,12 +517,12 @@
 
         const html = `<html><head><title>Reporte AbSmart</title><style>body{font-family:sans-serif;padding:20px;background:#f0f2f5}.box{background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}h1{color:#333}</style></head><body>
             <h1>Reporte AbSmart Pro</h1>
-            <div class="box"><p><strong>Fecha:</strong> ${date}</p><p><strong>Reps Totales:</strong> ${state.reps}</p><p><strong>HR Promedio:</strong> ${avgHR} bpm</p><p><strong>Duración:</strong> ${document.getElementById('timerValue').innerText}</p></div>
+            <div class="box"><p><strong>Fecha:</strong> ${date}</p><p><strong>Reps Totales:</strong> ${state.reps}</p><p><strong>HR Promedio:</strong> ${avgHR} bpm</p><p><strong>Duración:</strong> ${document.getElementById('timerValue').innerText}</p><p><strong>Reps/Min Final:</strong> ${document.getElementById('rpmValue').innerText}</p></div>
             <div class="box" style="height:400px"><canvas id="c"></canvas></div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
             <script>
                 new Chart(document.getElementById('c'), {
-                    type: 'bar', // Tipo principal bar para que admita ambos
+                    type: 'bar',
                     data: {
                         labels: ${JSON.stringify(labels)},
                         datasets: [
@@ -463,7 +533,7 @@
                                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                                 yAxisID: 'y1',
                                 barThickness: 8,
-                                order: 2 // Se dibuja primero (fondo)
+                                order: 2 
                             },
                             {
                                 label: 'Frecuencia Cardíaca (BPM)',
@@ -474,7 +544,7 @@
                                 yAxisID: 'y',
                                 tension: 0.4,
                                 pointRadius: 0,
-                                order: 1 // Se dibuja después (frente)
+                                order: 1 
                             }
                         ]
                     },
@@ -491,10 +561,4 @@
             
         const blob = new Blob([html], { type: 'text/html' });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `AbSmart_Report_${Date.now()}.html`;
-        link.click();
-    }
-</script>
-</body>
-</html>
+        link.href = URL.createObjectURL(blob)
